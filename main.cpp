@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cpr/cpr.h>
 
 int bonusCap = 104;
 std::vector tankStats{"str", "con", "dex", "qui"};
@@ -9,17 +10,34 @@ std::vector resists{"crush", "slash", "thrust", "heat", "cold", "matter", "energ
 std::vector casterClasses{"Animist", "Bonedancer","Runemaster", "Cabalist", "Cleric", "Bainshee", "Healer", "Druid", "Bard","Shaman", "Spiritmaster","Enchanter", "Mentalist", "Eldritch", "Necromancer", "Sorcerer", "Theurgist", "Wizard"};
 std::vector tankClasses{"Infiltrator", "Mercenary", "Armsman", "Savage", "Berserker", "Blademaster", "Shadowblade", "Hero", "Nightshade","Warrior", "Paladin"};
 std::vector hybridClasses{"Friar",  "Heretic", "Hunter",  "Champion", "Minstrel", "Skald",  "Thane", "Reaver","Valkyrie","Ranger", "Valewalker", "Warden", "Scout"};
+int SCPieces{ };
 
-std::string chestpiece{ };
-std::string arms{ };
-std::string legs{ };
-std::string helm{ };
-std::string hands{ };
-std::string boots{ };
+int displayIntroText()
+{
+
+    std::cout << "WELCOME TO INTERSTELLAR'S SPELLCRAFT CALCULATOR!" << '\n';
+    std::cout << "Inspired by Loki, this simple program will calculate optimal gem combinations based on only a few simple inputs from the user. Enjoy!" << '\n';
+
+    return 0;
+}
+
+int getNumberOfGearPieces()
+{
+
+    std::cout << "How many gear pieces will be spellcrafted? ";
+
+    std::cin >> SCPieces;
+
+    std::cout << "Spellcrafting " << SCPieces << " pieces";
+
+    std::cout << '\n';
+
+    return 0;
+};
 
 int getNecessaryStats() {
 
-    std::cout << "Enter the class you would like to generate a template for: ";
+    std::cout << "What class would you like to generate a template for? ";
 
     std::string className{};
     std::cin >> className;
@@ -78,49 +96,21 @@ int getNecessaryStats() {
         }
             
     }
-        
+
+    std::cout << '\n';
     
-    return 0;
-};
-
-int getGear()
-{
-    std::cout << "Enter Chestpiece here (if crafted, enter 'Crafted'): ";
-
-    std::cin >> chestpiece;
-
-    std::cout << "Enter Arms here (if crafted, enter 'Crafted'): ";
-
-    std::cin >> arms;
-
-    std::cout << "Enter Legs here (if crafted, enter 'Crafted'): ";
-
-    std::cin >> legs;
-
-    std::cout << "Enter Helm here (if crafted, enter 'Crafted'): ";
-
-    std::cin >> helm;
-
-    std::cout << "Enter Hands here (if crafted, enter 'Crafted'): ";
-
-    std::cin >> hands;
-
-    std::cout << "Enter Boots here (if crafted, enter 'Crafted'): ";
-
-    std::cin >> boots;
-
-    std::cout << "Gear: " << '\n' << chestpiece << '\n' << arms << '\n' << legs << '\n' << helm << '\n' << hands << '\n' << boots << '\n';
-
     return 0;
 };
 
 int main()
 {
-    // Template building program that uses https://eden-daoc.net to look up the items that you input and build your SC
+    // Template building program that uses your current stats + your number of gear pieces to calculate what gems you need
 
-    // getNecessaryStats();
+    displayIntroText();
 
-    getGear();
+    getNecessaryStats();
+
+    getNumberOfGearPieces();
 
     return 0;
 }
