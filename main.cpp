@@ -54,50 +54,90 @@ int getNeededStats()
 
     std::string acuAnswer { };
 
-    std::cout << "Would you like to cap Strength? (y/n)" << '\n';
+    std::cout << "Would you like to cap Strength? (y/n)";
 
     std::cin >> strAnswer;
 
-    if (strAnswer == "y" || "Y" || "yes" || "Yes")
+    if (strAnswer == "y")
+    {
         needStr = true;
+    }
     else
+    {
         needStr = false;
+    }
+        
 
-    std::cout << "Would you like to cap Constitution? (y/n)" << '\n';
+    std::cout << '\n';
+
+    std::cout << "Would you like to cap Constitution? (y/n)";
 
     std::cin >> conAnswer;
 
-    if (conAnswer == "y" || "Y" || "yes" || "Yes")
+    if (conAnswer == "y")
+    {
         needCon = true;
+    }
     else
+    {
         needCon = false;
+    }
 
-    std::cout << "Would you like to cap Dexterity? (y/n)" << '\n';
+    std::cout << '\n';
+    
+    std::cout << "Would you like to cap Dexterity? (y/n)";
 
     std::cin >> dexAnswer;
 
-    if (dexAnswer == "y" || "Y" || "yes" || "Yes")
+    if (dexAnswer == "y")
+    {
         needDex = true;
+    }
     else
+    {
         needDex = false;
-
-    std::cout << "Would you like to cap Quickness? (y/n)" << '\n';
+    }
+    std::cout << '\n';
+    
+    std::cout << "Would you like to cap Quickness? (y/n)";
 
     std::cin >> quiAnswer;
 
-    if (quiAnswer == "y" || "Y" || "yes" || "Yes")
+    if (quiAnswer == "y")
+    {
         needQui = true;
+    }
     else
+    {
         needQui = false;
+    }
 
-    std::cout << "Would you like to cap Acuity? (y/n)" << '\n';
+    std::cout << '\n';
+    
+    std::cout << "Would you like to cap Acuity? (y/n)";
 
     std::cin >> acuAnswer;
 
-    if (acuAnswer == "y" || "Y" || "yes" || "Yes")
+    if (acuAnswer == "y")
+    {
         needAcu = true;
+    }
     else
+    {
         needAcu = false;
+    }
+
+    std::cout << '\n';
+    
+    std::cout << "Need Strength = " << needStr << '\n';
+
+    std::cout << "Need Constitution = " << needCon << '\n';
+
+    std::cout << "Need Dexterity = " << needDex << '\n';
+
+    std::cout << "Need Quickness = " << needQui << '\n';
+
+    std::cout << "Need Acuity = " << needAcu << '\n';
 
     return 0;
 }
@@ -105,19 +145,50 @@ int getNeededStats()
 int getCurrentStats() 
 {
 
-    std::cout << "Enter current Strength bonus: " << '\n';
+    if (needStr)
+    {
+        std::cout << "Enter current Strength bonus: ";
 
-    std::cin >> currentStr;
+        std::cin >> currentStr;
 
-    std::cout << '\n';
+        std::cout << '\n';
+    }
+        
+    if (needCon)
+    {
+        std::cout << "Enter current Constitution bonus: ";
 
-    std::cout << "Enter current Constitution bonus: " << '\n';
+        std::cin >> currentCon;
 
-    std::cin >> currentCon;
+        std::cout << '\n';
+    }
 
-    std::cout << '\n';
+    if (needDex)
+    {
+        std::cout << "Enter current Dexterity bonus: ";
 
-    std::cout << "Enter current Quickness bonus: ";
+        std::cin >> currentDex;
+
+        std::cout << '\n';
+    }
+
+    if (needQui)
+    {
+        std::cout << "Enter current Quickness bonus: ";
+
+        std::cin >> currentQui;
+
+        std::cout << '\n';
+    }
+
+    if (needAcu)
+    {
+        std::cout << "Enter current Acuity bonus: ";
+
+        std::cin >> currentAcu;
+
+        std::cout << '\n';
+    }
 
     return 0;
 }
@@ -133,6 +204,26 @@ int getTemplateTitle() {
     return 0;
 };
 
+int logCurrStats() 
+{
+    if (needStr)
+        std::cout << "Current Strength = " << currentStr << '\n';
+
+    if (needCon)
+        std::cout << "Current Constitution = " << currentCon << '\n';
+
+    if (needDex)
+        std::cout << "Current Dexterity = " << currentDex << '\n';
+
+    if (needQui)
+        std::cout << "Current Quickness = " << currentQui << '\n';
+
+    if (needAcu)
+        std::cout << "Current Acuity = " << currentAcu << '\n';
+
+    return 0;
+}
+
 int main()
 {
     // Template building program that uses your current stats + your number of gear pieces to calculate what gems you need
@@ -142,6 +233,12 @@ int main()
     getTemplateTitle();
 
     getNumberOfGearPieces();
+
+    getNeededStats();
+
+    getCurrentStats();
+
+    logCurrStats();
 
     return 0;
 }
