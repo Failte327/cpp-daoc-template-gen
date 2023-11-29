@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <map>
+
+std::map<int, std::string> gemQualityMap { };
 
 int bonusCap = 104;
 int currentStr { };
@@ -17,6 +20,27 @@ std::vector allStats{"str", "con", "dex", "qui", "acu"};
 std::vector resists{"crush", "slash", "thrust", "heat", "cold", "matter", "energy", "body", "spirit"};
 
 int SCPieces{ };
+
+int createSCMaps()
+{
+    gemQualityMap[1] = "raw";
+    gemQualityMap[4] = "uncut";
+    gemQualityMap[7] = "rough";
+    gemQualityMap[10] = "flawed";
+    gemQualityMap[13] = "imperfect";
+    gemQualityMap[16] = "polished";
+    gemQualityMap[19] = "faceted";
+    gemQualityMap[22] = "precious";
+    gemQualityMap[25] = "flawless";
+    gemQualityMap[28] = "perfect";
+
+    for (auto const [key, val] : gemQualityMap)
+    {
+        std::cout << key << ": " << val << '\n';
+    }
+
+    return 0;
+}
 
 int displayIntroText()
 {
@@ -227,6 +251,7 @@ int logCurrStats()
 int main()
 {
     // Template building program that uses your current stats + your number of gear pieces to calculate what gems you need
+    createSCMaps();
 
     displayIntroText();
 
