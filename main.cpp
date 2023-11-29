@@ -1,15 +1,21 @@
 #include <iostream>
 #include <vector>
-#include <cpr/cpr.h>
 
 int bonusCap = 104;
-std::vector tankStats{"str", "con", "dex", "qui"};
-std::vector casterStats{"con", "dex", "acu"};
-std::vector hybridStats{"str", "con", "dex", "qui", "acu"};
+int currentStr { };
+int currentCon { };
+int currentDex { };
+int currentQui { };
+int currentAcu { };
+bool needStr { };
+bool needCon { };
+bool needDex { };
+bool needQui { };
+bool needAcu { };
+std::string templateName{ };
+std::vector allStats{"str", "con", "dex", "qui", "acu"};
 std::vector resists{"crush", "slash", "thrust", "heat", "cold", "matter", "energy", "body", "spirit"};
-std::vector casterClasses{"Animist", "Bonedancer","Runemaster", "Cabalist", "Cleric", "Bainshee", "Healer", "Druid", "Bard","Shaman", "Spiritmaster","Enchanter", "Mentalist", "Eldritch", "Necromancer", "Sorcerer", "Theurgist", "Wizard"};
-std::vector tankClasses{"Infiltrator", "Mercenary", "Armsman", "Savage", "Berserker", "Blademaster", "Shadowblade", "Hero", "Nightshade","Warrior", "Paladin"};
-std::vector hybridClasses{"Friar",  "Heretic", "Hunter",  "Champion", "Minstrel", "Skald",  "Thane", "Reaver","Valkyrie","Ranger", "Valewalker", "Warden", "Scout"};
+
 int SCPieces{ };
 
 int displayIntroText()
@@ -35,69 +41,94 @@ int getNumberOfGearPieces()
     return 0;
 };
 
-int getNecessaryStats() {
+int getNeededStats() 
+{
 
-    std::cout << "What class would you like to generate a template for? ";
+    std::string strAnswer { };
 
-    std::string className{};
-    std::cin >> className;
+    std::string conAnswer { };
 
-    std::size_t casterClassesLength { casterClasses.size() };
-    std::size_t casterStatsLength { casterStats.size() };
+    std::string dexAnswer { };
 
-    std::size_t tankClassesLength { tankClasses.size() };
-    std::size_t tankStatsLength { tankStats.size() };
+    std::string quiAnswer { };
 
-    std::size_t hybridClassesLength { hybridClasses.size() };
-    std::size_t hybridStatsLength { hybridStats.size() };
+    std::string acuAnswer { };
 
-    for (std::size_t index{ 0 }; index < casterClassesLength; ++index) 
-    {
-        if (casterClasses[index] == className)
-        {
-            std::cout << "Necessary Stats: " << '\n';
-            for (std::size_t index2{ 0 }; index2 < casterStatsLength; ++index2)
-                std::cout << casterStats[index2] << " ";
-        }
-        else
-        {
-            std::cout << "";
-        }
-            
-    }
-        
+    std::cout << "Would you like to cap Strength? (y/n)" << '\n';
 
-    for (std::size_t index{ 0 }; index < tankClassesLength; ++index)
-    {
-        if (tankClasses[index] == className)
-        {
-            std::cout << "Necessary Stats: " << '\n';
-            for (std::size_t index2{ 0 }; index2 < tankStatsLength; ++index2)
-                std::cout << tankStats[index2] << " ";
-        }
-        else
-        {
-            std::cout << "";
-        }
-    }
-        
+    std::cin >> strAnswer;
 
-    for (std::size_t index{ 0 }; index < hybridClassesLength; ++index) 
-    {
-        if (hybridClasses[index] == className)
-        {
-            std::cout << "Necessary Stats: " << '\n';
-            for (std::size_t index2{ 0 }; index2 < hybridStatsLength; ++index2)
-                std::cout << hybridStats[index2] << " ";
-        }
-        else
-        {
-            std::cout << "";
-        }
-            
-    }
+    if (strAnswer == "y" || "Y" || "yes" || "Yes")
+        needStr = true;
+    else
+        needStr = false;
+
+    std::cout << "Would you like to cap Constitution? (y/n)" << '\n';
+
+    std::cin >> conAnswer;
+
+    if (conAnswer == "y" || "Y" || "yes" || "Yes")
+        needCon = true;
+    else
+        needCon = false;
+
+    std::cout << "Would you like to cap Dexterity? (y/n)" << '\n';
+
+    std::cin >> dexAnswer;
+
+    if (dexAnswer == "y" || "Y" || "yes" || "Yes")
+        needDex = true;
+    else
+        needDex = false;
+
+    std::cout << "Would you like to cap Quickness? (y/n)" << '\n';
+
+    std::cin >> quiAnswer;
+
+    if (quiAnswer == "y" || "Y" || "yes" || "Yes")
+        needQui = true;
+    else
+        needQui = false;
+
+    std::cout << "Would you like to cap Acuity? (y/n)" << '\n';
+
+    std::cin >> acuAnswer;
+
+    if (acuAnswer == "y" || "Y" || "yes" || "Yes")
+        needAcu = true;
+    else
+        needAcu = false;
+
+    return 0;
+}
+
+int getCurrentStats() 
+{
+
+    std::cout << "Enter current Strength bonus: " << '\n';
+
+    std::cin >> currentStr;
 
     std::cout << '\n';
+
+    std::cout << "Enter current Constitution bonus: " << '\n';
+
+    std::cin >> currentCon;
+
+    std::cout << '\n';
+
+    std::cout << "Enter current Quickness bonus: ";
+
+    return 0;
+}
+
+int getTemplateTitle() {
+
+    std::cout << "What would you like to name this template? " << '\n';
+
+    std::cin >> templateName;
+
+    std::cout << "Creating " << templateName << " template" << '\n';
     
     return 0;
 };
@@ -108,7 +139,7 @@ int main()
 
     displayIntroText();
 
-    getNecessaryStats();
+    getTemplateTitle();
 
     getNumberOfGearPieces();
 
