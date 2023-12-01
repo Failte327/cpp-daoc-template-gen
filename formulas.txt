@@ -1,0 +1,6 @@
+
+STAT IMBUE: (bonusValue - 1) * 2 / 3 + 1;
+POWER IMBUE: (bonusValue * 2) - 2;
+HP IMBUE: bonusValue / 4;
+RESIST IMBUE: (bonusValue * 2) - 2;
+SKILL IMBUE: (bonusValue - 1) * 5;

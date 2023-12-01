@@ -380,6 +380,54 @@ int logCurrStats()
     return 0;
 }
 
+double calcImbueCostStat(int bonusValue)
+{
+
+    double imbueCost = (bonusValue - 1) * 2 / 3 + 1;
+
+    std::cout << "Imbue cost: " << imbueCost << '\n';
+
+    return imbueCost;
+}
+
+double calcImbueCostPower(int bonusValue)
+{
+
+    double imbueCost = (bonusValue * 2) - 2;
+
+    std::cout << "Imbue cost: " << imbueCost << '\n';
+
+    return imbueCost;
+}
+
+double calcImbueCostHealth(int bonusValue)
+{
+
+    double imbueCost = bonusValue / 4;
+
+    std::cout << "Imbue cost: " << imbueCost << '\n';
+
+    return imbueCost;
+}
+
+double calcImbueCostResist(int bonusValue)
+{
+    double imbueCost = (bonusValue * 2) - 2;
+
+    std::cout << "Imbue cost: " << imbueCost << '\n';
+
+    return imbueCost;
+}
+
+double calcImbueCostSkill(int bonusValue)
+{
+    double imbueCost = (bonusValue - 1) * 5;
+
+    std::cout << "Imbue cost: " << imbueCost << '\n';
+
+    return imbueCost;
+}
+
 int main()
 {
     // Template building program that uses your current stats + your number of gear pieces to calculate what gems you need
