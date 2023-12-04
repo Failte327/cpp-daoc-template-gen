@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <tabulate/table.hpp>
 
 std::map<int, std::string> gemToStatsMap { };
 std::map<int, std::string> gemToResistsMap { };
@@ -11,7 +12,7 @@ std::map<std::string, int> statRankingsMap { };
 std::map<std::string, std::string> statsMap { };
 std::map<std::string, std::string> resistsMap { };
 std::map<std::string, std::string> bonusMap { };
-#include <tabulate/table.hpp>
+std::map<std::string, std::vector<std::string>> scPiecesGems { };
 
 int bonusCap = 104;
 int SCPieces{ };
@@ -245,11 +246,6 @@ int getNeededStats()
     }
 
     std::cout << '\n';
-    std::cout << "Need Strength = " << needStr << '\n';
-    std::cout << "Need Constitution = " << needCon << '\n';
-    std::cout << "Need Dexterity = " << needDex << '\n';
-    std::cout << "Need Quickness = " << needQui << '\n';
-    std::cout << "Need Acuity = " << needAcu << '\n';
 
     return 0;
 }
@@ -366,32 +362,53 @@ int createTemplateTable()
 
     tabulate::Table statsTable{ };
 
+    int tableRows = 1;
+
+    statsTable.add_row({"Stat", "Value"});
+    statsTable.row(0).format()
+      .font_color(tabulate::Color::white)
+      .font_align(tabulate::FontAlign::center)
+      .font_style({tabulate::FontStyle::bold});
+
     if (needStr)
+    {
+        tableRows++;
         statsTable.add_row({"Strength", std::to_string(currentStr)});
-
+    }
+        
     if (needCon)
+    {
+        tableRows++;
         statsTable.add_row({"Constitution", std::to_string(currentCon)});
-
+    }
+        
     if (needDex)
+    {
+        tableRows++;
         statsTable.add_row({"Dexterity", std::to_string(currentDex)});
+    }
 
     if (needQui)
+    {
+        tableRows++;
         statsTable.add_row({"Quickness", std::to_string(currentQui)});
-
+    }
+        
     if (needAcu)
+    {
+        tableRows++;
         statsTable.add_row({"Acuity", std::to_string(currentAcu)});
+    }
+        
+    for(int i = 1; i < tableRows; i++)
+    {
+        statsTable.row(i).format()
+        .font_color(tabulate::Color::green)
+        .font_align(tabulate::FontAlign::center)
+        .font_style({tabulate::FontStyle::bold});
+    }
 
-    statsTable.row(0).format()
-      .font_color(tabulate::Color::yellow)
-      .font_align(tabulate::FontAlign::center)
-      .font_style({tabulate::FontStyle::bold});
-
-    statsTable.row(1).format()
-      .font_color(tabulate::Color::yellow)
-      .font_align(tabulate::FontAlign::center)
-      .font_style({tabulate::FontStyle::bold});
-
-    std::cout << statsTable;
+    std::cout << statsTable << '\n';
 
     return 0;
 }
@@ -400,7 +417,6 @@ double calcImbueCostStat(int bonusValue)
 {
 
     double imbueCost = (bonusValue - 1) * 2 / 3 + 1;
-
     std::cout << "Imbue cost: " << imbueCost << '\n';
 
     return imbueCost;
@@ -410,7 +426,6 @@ double calcImbueCostPower(int bonusValue)
 {
 
     double imbueCost = (bonusValue * 2) - 2;
-
     std::cout << "Imbue cost: " << imbueCost << '\n';
 
     return imbueCost;
@@ -420,7 +435,6 @@ double calcImbueCostHealth(int bonusValue)
 {
 
     double imbueCost = bonusValue / 4;
-
     std::cout << "Imbue cost: " << imbueCost << '\n';
 
     return imbueCost;
@@ -429,7 +443,6 @@ double calcImbueCostHealth(int bonusValue)
 double calcImbueCostResist(int bonusValue)
 {
     double imbueCost = (bonusValue * 2) - 2;
-
     std::cout << "Imbue cost: " << imbueCost << '\n';
 
     return imbueCost;
@@ -438,10 +451,21 @@ double calcImbueCostResist(int bonusValue)
 double calcImbueCostSkill(int bonusValue)
 {
     double imbueCost = (bonusValue - 1) * 5;
-
     std::cout << "Imbue cost: " << imbueCost << '\n';
 
     return imbueCost;
+}
+
+int scCalculator()
+{
+
+    for(int i = 0; i < SCPieces; i++)
+    {
+        std::vector<std::string> gems{ };
+        
+    }
+
+    return 0;
 }
 
 int main()
@@ -454,6 +478,8 @@ int main()
     getNeededStats();
     getCurrentStats();
     createTemplateTable();
+    // getStatRankings();
+
 
     return 0;
 }
