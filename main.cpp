@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <tabulate/table.hpp>
 
 int bonusCap = 104;
 int currentStr { };
@@ -204,22 +205,37 @@ int getTemplateTitle() {
     return 0;
 };
 
-int logCurrStats() 
+int createTemplateTable()
 {
+
+    tabulate::Table statsTable{ };
+
     if (needStr)
-        std::cout << "Current Strength = " << currentStr << '\n';
+        statsTable.add_row({"Strength", std::to_string(currentStr)});
 
     if (needCon)
-        std::cout << "Current Constitution = " << currentCon << '\n';
+        statsTable.add_row({"Constitution", std::to_string(currentCon)});
 
     if (needDex)
-        std::cout << "Current Dexterity = " << currentDex << '\n';
+        statsTable.add_row({"Dexterity", std::to_string(currentDex)});
 
     if (needQui)
-        std::cout << "Current Quickness = " << currentQui << '\n';
+        statsTable.add_row({"Quickness", std::to_string(currentQui)});
 
     if (needAcu)
-        std::cout << "Current Acuity = " << currentAcu << '\n';
+        statsTable.add_row({"Acuity", std::to_string(currentAcu)});
+
+    statsTable.row(0).format()
+      .font_color(tabulate::Color::yellow)
+      .font_align(tabulate::FontAlign::center)
+      .font_style({tabulate::FontStyle::bold});
+
+    statsTable.row(1).format()
+      .font_color(tabulate::Color::yellow)
+      .font_align(tabulate::FontAlign::center)
+      .font_style({tabulate::FontStyle::bold});
+
+    std::cout << statsTable;
 
     return 0;
 }
@@ -238,7 +254,7 @@ int main()
 
     getCurrentStats();
 
-    logCurrStats();
+    createTemplateTable();
 
     return 0;
 }
