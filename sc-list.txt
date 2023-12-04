@@ -1,0 +1,253 @@
+STATS
+
+STR - fiery essence
+
+DEX - vapor essence
+
+QUI - airy essence
+
+CON - earthen essence
+
+INT - dusty essence
+
+PIE - watery essence
+
+EMP - heated essence
+
+CHA - icy essence
+
+1 - raw
+
+4 - uncut
+
+7 - rough
+
+10 - flawed
+
+13 - imperfect
+
+16 - polished
+
+19 - faceted
+
+22 - precious
+
+25 - flawless
+
+28 - perfect
+
+RESISTS
+
+body - dusty shielding
+
+cold - icy shielding
+
+heat - heated shielding
+
+energy - light shielding
+
+matter - earthen shielding
+
+spirit - vapor shielding
+
+thrust - airy shielding
+
+crush - fiery shielding
+
+slash - watery shielding
+
+1 - raw
+
+2 - uncut
+
+3 - rough
+
+5 - flawed
+
+7 - imperfect
+
+9 - polished
+
+11 - faceted
+
+13 - precious
+
+15 - flawless
+
+17 - perfect
+
+HITS - blood essence
+
+4 - raw
+
+12 - uncut
+
+20 - rough
+
+28 - flawed
+
+36 - imperfect
+
+44 - polished
+
+52 - faceted
+
+60 - precious
+
+68 - flawless
+
+76 - perfect
+
+POWER - mystic essence
+
+1 - raw
+
+2 - uncut
+
+3 - rough
+
+5 - flawed
+
+7 - imperfect
+
+9 - polished
+
+11 - faceted
+
+13 - precious
+
+15 - flawless
+
+17 - perfect
+
+FOCUS
+
+body - heated focus
+
+cold - icy focus
+
+death servant - ashen focus
+
+death sight - vacuous focus
+
+earth - earthen focus
+
+fire - fiery focus
+
+matter - dusty focus
+
+mind - watery focus
+
+painworking - salt encrusted focus
+
+spirit - vapor focus
+
+wind - airy focus
+
+all - brilliant focus
+
+5 - raw
+
+10 - uncut
+
+15 - rough
+
+20 - flawed
+
+25 - imperfect
+
+30 - polished
+
+35 - faceted
+
+40 - precious
+
+45 - flawless
+
+50 - perfect
+
+SKILL
+
+body destruction - heated evocation sigil
+
+chants - earthen fervor sigil
+
+critical strike - heated battle jewel
+
+crossbow - vapor war sigil
+
+crush - fiery war sigil
+
+death servant - ashen fervor sigil
+
+deathsight - vacuous fervor sigil
+
+dual wield - icy war sigil
+
+earth - earthen evocation sigil
+
+enhancement - airy fervor sigil
+
+envenom - dusty battle jewel
+
+flexible - molten magma war sigil
+
+fire - fiery evocation sigil
+
+healing - watery fervor sigil
+
+ice - icy evocation sigil
+
+instuments - vapor fervor sigil
+
+longbow - airy war sigil
+
+matter - dusty evocation sigil
+
+mind twisting - watery evocation sigil
+
+painworking - salt encrusted fervor sigil
+
+parry - vapor battle jewel
+
+polearm - earthen war sigil
+
+shield - fiery battle jewel
+
+slash - watery war sigil
+
+smite - fiery fervor sigil
+
+soulrending - steaming fervor sigil
+
+spirit animation - vapor evocation sigil
+
+staff - earthen battle jewel
+
+stealth - airy battle jewel
+
+thrust - dusty war sigil
+
+two handed - heated war sigil
+
+wind - airy evocation sigil
+
+all: primary melee - finesse war sigil
+
+all: casting - finesse fervor sigil
+
+1 - raw
+
+2 - uncut
+
+3 - rough
+
+4 - flawed
+
+5 - imperfect
+
+6 - polished
+
+7 - faceted
+
+8 - precious
