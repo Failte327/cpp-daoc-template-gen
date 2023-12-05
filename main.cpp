@@ -2,8 +2,6 @@
 #include <vector>
 #include <map>
 #include <tabulate/table.hpp>
-#include <math.h> 
-#include <stdio.h> 
 
 std::map<int, std::string> gemToStatsMap { };
 std::map<int, std::string> gemToResistsMap { };
@@ -12,6 +10,8 @@ std::map<int, std::string> gemToPowerMap { };
 std::map<int, std::string> gemToSkillMap { };
 std::map<std::string, int> statRankingsMap { };
 std::map<std::string, std::string> statsMap { };
+std::map<std::string, int> statsToCurrentDeficitMap { };
+std::map<std::string, std::string> statsToCurrentMap { };
 std::map<std::string, std::string> resistsMap { };
 std::map<std::string, int> currentResistsMap { };
 std::map<std::string, std::string> bonusMap { };
@@ -37,12 +37,84 @@ std::string templateName{ };
 std::vector allStats{"str", "con", "dex", "qui", "acu"};
 std::vector resists{"crush", "slash", "thrust", "heat", "cold", "matter", "energy", "body", "spirit"};
 
+
+struct greater
+{
+    template<class T>
+    bool operator()(T const &a, T const &b) const { return a > b; }
+};
+
+// Rank the stats by how many points they still need (highest being first)
+int prioritizeStats()
+{
+    int strengthDeficit {};
+    int constitutionDeficit {};
+    int dexterityDeficit {};
+    int quicknessDeficit {};
+    int acuityDeficit {};
+    std::vector<std::string> statScores {};
+    for(auto const stat: neededStats)
+    {
+        if (stat == "Strength")
+        {
+            strengthDeficit = bonusCap - currentStr;
+            statsToCurrentDeficitMap[stat] = strengthDeficit;
+        }
+        if (stat == "Dexterity")
+        {
+            dexterityDeficit = bonusCap - currentDex;
+            statsToCurrentDeficitMap[stat] = dexterityDeficit;
+        }
+        if (stat == "Constitution")
+        {
+           constitutionDeficit = bonusCap - currentCon;
+           statsToCurrentDeficitMap[stat] = constitutionDeficit;
+        }
+        if (stat == "Quickness")
+        {
+            quicknessDeficit = bonusCap - currentQui;
+            statsToCurrentDeficitMap[stat] = quicknessDeficit;
+        }
+        if (stat == "Acuity")
+        {
+            acuityDeficit = bonusCap - currentAcu;
+            statsToCurrentDeficitMap[stat] = acuityDeficit;
+        }
+    }
+
+    for (auto const [key, val] : statsToCurrentDeficitMap)
+    {
+        statScores.push_back(std::to_string(val));
+    }
+
+    std::sort(statScores.begin(), statScores.end(), greater());
+
+    for(int i = 0; i < statScores.size(); i++)
+    {
+        for(auto const [key, val]: statsToCurrentDeficitMap)
+        {
+            if (statScores[i] == std::to_string(val))
+            {
+                int rank = i + 1;
+                statRankingsMap[key] = rank;
+            }
+        }
+    }
+
+    for(auto const [key, val] : statRankingsMap)
+    {
+        std::cout << key << ": " << val;
+    }
+
+    return 0;
+}
+
 int getCurrentResists()
 {
     for (auto const entry : resists)
     {
         int resist {};
-        std::cout << "Enter current " << entry << " resist";
+        std::cout << "Enter current " << entry << " resist: ";
         std::cin >> resist;
         currentResistsMap[entry] = resist;
     }
@@ -88,11 +160,12 @@ int createSCMaps()
     gemToStatsMap[25] = "flawless";
     gemToStatsMap[28] = "perfect";
 
-    statsMap["str"] = "fiery essence";
-    statsMap["dex"] = "vapor essence";
-    statsMap["qui"] = "airy essence";
-    statsMap["con"] = "earthen essence";
-    statsMap["int"] = "dusty essence";
+    statsMap["Strength"] = "fiery essence";
+    statsMap["Dexterity"] = "vapor essence";
+    statsMap["Quickness"] = "airy essence";
+    statsMap["Constitution"] = "earthen essence";
+    // placeholder for acuity being 4 different essences, int is 'dusty essence'
+    statsMap["Acuity"] = "acuity essence";
     statsMap["pie"] = "watery essence";
     statsMap["emp"] = "heated essence";
     statsMap["cha"] = "icy essence";
@@ -258,63 +331,6 @@ int getNeededStats()
     return 0;
 }
 
-int getStatRankings()
-{
-
-    int strRank{ };
-    int conRank{ };
-    int dexRank{ };
-    int quiRank{ };
-    int acuRank{ };
-
-    if(needStr)
-    {
-        std::cout << "Rank strength in regards to importance (1 being the most important)";
-        std::cin >> strRank;
-        statRankingsMap["str"] = strRank;
-        std::cout << '\n';
-    }
-
-    if(needCon)
-    {
-        std::cout << "Rank constitution in regards to importance (1 being the most important)";
-        std::cin >> conRank;
-        statRankingsMap["con"] = conRank;
-        std::cout << '\n';
-    }
-
-    if(needDex)
-    {
-        std::cout << "Rank dexterity in regards to importance (1 being the most important)";
-        std::cin >> dexRank;
-        statRankingsMap["dex"] = dexRank;
-        std::cout << '\n';
-    }
-
-    if(needQui)
-    {
-        std::cout << "Rank quickness in regards to importance (1 being the most important)";
-        std::cin >> quiRank;
-        statRankingsMap["qui"] = quiRank;
-        std::cout << '\n';
-    }
-
-    if(needAcu)
-    {
-        std::cout << "Rank acuity in regards to importance (1 being the most important)";
-        std::cin >> acuRank;
-        statRankingsMap["acu"] = acuRank;
-        std::cout << '\n';
-    }
-
-    for(auto const& [key, val] : statRankingsMap)
-    {
-        std::cout << key << ": " << val << '\n';
-    }
-
-    return 0;
-}
-
 int getCurrentStats() 
 {
 
@@ -322,35 +338,35 @@ int getCurrentStats()
     {
         std::cout << "Enter current Strength bonus: ";
         std::cin >> currentStr;
-        std::cout << '\n';
+        statsToCurrentMap["Strength"] = currentStr;
     }
         
     if (needCon)
     {
         std::cout << "Enter current Constitution bonus: ";
         std::cin >> currentCon;
-        std::cout << '\n';
+        statsToCurrentMap["Constitution"] = currentCon;
     }
 
     if (needDex)
     {
         std::cout << "Enter current Dexterity bonus: ";
         std::cin >> currentDex;
-        std::cout << '\n';
+        statsToCurrentMap["Dexterity"] = currentDex;
     }
 
     if (needQui)
     {
         std::cout << "Enter current Quickness bonus: ";
         std::cin >> currentQui;
-        std::cout << '\n';
+        statsToCurrentMap["Quickness"] = currentQui;
     }
 
     if (needAcu)
     {
         std::cout << "Enter current Acuity bonus: ";
         std::cin >> currentAcu;
-        std::cout << '\n';
+        statsToCurrentMap["Acuity"] = currentAcu;
     }
 
     return 0;
@@ -466,120 +482,552 @@ int scCalculator()
     {
         double totalImbueCost = 0.0;
         std::vector<std::string> gems{ };
-        for(int n = 0; n < neededStats.size(); n++)
+        for(auto const [key, val] : statRankingsMap)
         {
-            if (neededStats[n] == "Strength")
+            if ((gems.size() < 5) && (totalImbueCost < imbueCap))
             {
-                std::cout << "Need " << bonusCap - currentStr << " strength from " << SCPieces << " sc pieces" << '\n';
-                for (auto const [key, val] : gemToStatsMap)
+                if(val == 1)
                 {
-                    double gemCost = calcImbueCostStat(key);
-                    if (((bonusCap - (currentStr + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+                    for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        gems.push_back(val + " fiery essence");
-                        currentStr = currentStr + key;
-                        totalImbueCost = totalImbueCost + gemCost;
-                        break;
-                    }
-                    if (((bonusCap - (currentStr + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
-                    {
-                        gems.push_back(val + " fiery essence");
-                        currentStr = currentStr + key;
-                        totalImbueCost = totalImbueCost + gemCost;
-                        break;
+                        if (key == key2)
+                        {
+                            std::string gemPrefix { };
+                            std::string gemStat { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 10)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 16)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 19)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 22)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 25)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 28)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available
+                                if (deficit >= 50)
+                                {
+                                    gemPrefix = "perfect";
+                                }
+                                // Choose a 3/4 value (22) to conserve available imbue points while pumping stats
+                                else if (deficit >= 35)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                // Choose a median value (16) to conserve available imbue points
+                                else if (deficit >= 15)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : statsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemStat = val3;
+                                }
+                            }
+                            int cost { };
+                            int bonus { };
+                            
+                            for (auto const [key4, val4]: gemToStatsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostStat(bonus);
+                                }
+                            }
+                            
+                            gemName = gemPrefix + " " + gemStat;
+                            if (key == "Strength")
+                            {
+                                currentStr = currentStr + bonus;
+                            }
+                            if (key == "Dexterity")
+                            {
+                                currentDex = currentDex + bonus;
+                            }
+                            if (key == "Constitution")
+                            {
+                                currentCon = currentCon + bonus;
+                            }
+                            if (key == "Quickness")
+                            {
+                                currentQui = currentQui + bonus;
+                            }
+                            if (key == "Acuity")
+                            {
+                                currentAcu = currentAcu + bonus;
+                            }
+                            totalImbueCost = totalImbueCost + cost;
+                            
+                            gems.push_back(gemName);
+                        }
                     }
                 }
-            }
-            if (neededStats[n] == "Dexterity")
-            {
-                std::cout << "Need " << bonusCap - currentDex << " dexterity from " << SCPieces << " sc pieces" << '\n';
-                for (auto const [key, val] : gemToStatsMap)
+                else if(val == 2)
                 {
-                    double gemCost = calcImbueCostStat(key);
-                    if (((bonusCap - (currentDex + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+                    for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        gems.push_back(val + " vapor essence");
-                        currentDex = currentDex + key;
-                        totalImbueCost = totalImbueCost + gemCost;
-                        break;
-                    }
-                    if (((bonusCap - (currentDex + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
-                    {
-                        gems.push_back(val + " vapor essence");
-                        currentDex = currentDex + key;
-                        totalImbueCost = totalImbueCost + gemCost;
-                        break;
+                        if (key == key2)
+                        {
+                            std::string gemPrefix { };
+                            std::string gemStat { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 10)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 16)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 19)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 22)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 25)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 28)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available
+                                if (deficit >= 50)
+                                {
+                                    gemPrefix = "perfect";
+                                }
+                                // Choose a 3/4 value (22) to conserve available imbue points while pumping stats
+                                else if (deficit >= 35)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                // Choose a median value (16) to conserve available imbue points
+                                else if (deficit >= 15)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : statsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemStat = val3;
+                                }
+                            }
+                            int cost { };
+                            int bonus { };
+                            
+                            for (auto const [key4, val4]: gemToStatsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostStat(bonus);
+                                }
+                            }
+                            
+                            gemName = gemPrefix + " " + gemStat;
+                            if (key == "Strength")
+                            {
+                                currentStr = currentStr + bonus;
+                            }
+                            if (key == "Dexterity")
+                            {
+                                currentDex = currentDex + bonus;
+                            }
+                            if (key == "Constitution")
+                            {
+                                currentCon = currentCon + bonus;
+                            }
+                            if (key == "Quickness")
+                            {
+                                currentQui = currentQui + bonus;
+                            }
+                            if (key == "Acuity")
+                            {
+                                currentAcu = currentAcu + bonus;
+                            }
+                            totalImbueCost = totalImbueCost + cost;
+                            
+                            gems.push_back(gemName);
+                        }
                     }
                 }
-            }
-            if (neededStats[n] == "Quickness")
-            {
-                std::cout << "Need " << bonusCap - currentQui << " quickness from " << SCPieces << " sc pieces" << '\n';
-                for (auto const [key, val] : gemToStatsMap)
+                else if(val == 3)
                 {
-                    double gemCost = calcImbueCostStat(key);
-                    if (((bonusCap - (currentQui + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+                    for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        gems.push_back(val + " airy essence");
-                        currentQui = currentQui + key;
-                        totalImbueCost = totalImbueCost + gemCost;
-                        break;
-                    }
-                    if (((bonusCap - (currentQui + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
-                    {
-                        gems.push_back(val + " airy essence");
-                        currentQui = currentQui + key;
-                        totalImbueCost = totalImbueCost + gemCost;
-                        break;
+                        if (key == key2)
+                        {
+                            std::string gemPrefix { };
+                            std::string gemStat { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 10)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 16)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 19)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 22)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 25)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 28)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available
+                                if (deficit >= 50)
+                                {
+                                    gemPrefix = "perfect";
+                                }
+                                // Choose a 3/4 value (22) to conserve available imbue points while pumping stats
+                                else if (deficit >= 35)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                // Choose a median value (16) to conserve available imbue points
+                                else if (deficit >= 15)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : statsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemStat = val3;
+                                }
+                            }
+                            int cost { };
+                            int bonus { };
+                            
+                            for (auto const [key4, val4]: gemToStatsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostStat(bonus);
+                                }
+                            }
+                            
+                            gemName = gemPrefix + " " + gemStat;
+                            if (key == "Strength")
+                            {
+                                currentStr = currentStr + bonus;
+                            }
+                            if (key == "Dexterity")
+                            {
+                                currentDex = currentDex + bonus;
+                            }
+                            if (key == "Constitution")
+                            {
+                                currentCon = currentCon + bonus;
+                            }
+                            if (key == "Quickness")
+                            {
+                                currentQui = currentQui + bonus;
+                            }
+                            if (key == "Acuity")
+                            {
+                                currentAcu = currentAcu + bonus;
+                            }
+                            totalImbueCost = totalImbueCost + cost;
+                            
+                            gems.push_back(gemName);
+                        }
                     }
                 }
-            }
-            if (neededStats[n] == "Constitution")
-            {
-                std::cout << "Need " << bonusCap - currentCon << " constitution from " << SCPieces << " sc pieces" << '\n';
-                for (auto const [key, val] : gemToStatsMap)
+                else if(val == 4)
                 {
-                    double gemCost = calcImbueCostStat(key);
-                    if (((bonusCap - (currentCon + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+                    for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        gems.push_back(val + " earthen essence");
-                        currentCon = currentCon + key;
-                        totalImbueCost = totalImbueCost + gemCost;
-                        break;
-                    }
-                    if (((bonusCap - (currentCon + key)) > 9) && (key >= 16))
-                    {
-                        gems.push_back(val + " earthen essence");
-                        currentCon = currentCon + key;
-                        totalImbueCost = totalImbueCost + gemCost;
-                        break;
+                        if (key == key2)
+                        {
+                            std::string gemPrefix { };
+                            std::string gemStat { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 10)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 16)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 19)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 22)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 25)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 28)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available
+                                if (deficit >= 50)
+                                {
+                                    gemPrefix = "perfect";
+                                }
+                                // Choose a 3/4 value (22) to conserve available imbue points while pumping stats
+                                else if (deficit >= 35)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                // Choose a median value (16) to conserve available imbue points
+                                else if (deficit >= 15)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : statsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemStat = val3;
+                                }
+                            }
+                            int cost { };
+                            int bonus { };
+                            
+                            for (auto const [key4, val4]: gemToStatsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostStat(bonus);
+                                }
+                            }
+                            
+                            gemName = gemPrefix + " " + gemStat;
+                            if (key == "Strength")
+                            {
+                                currentStr = currentStr + bonus;
+                            }
+                            if (key == "Dexterity")
+                            {
+                                currentDex = currentDex + bonus;
+                            }
+                            if (key == "Constitution")
+                            {
+                                currentCon = currentCon + bonus;
+                            }
+                            if (key == "Quickness")
+                            {
+                                currentQui = currentQui + bonus;
+                            }
+                            if (key == "Acuity")
+                            {
+                                currentAcu = currentAcu + bonus;
+                            }
+                            totalImbueCost = totalImbueCost + cost;
+                            
+                            gems.push_back(gemName);
+                        }
                     }
                 }
-            }
-            if (neededStats[n] == "Acuity")
-            {
-                std::cout << "Need " << bonusCap - currentAcu << " acuity from " << SCPieces << " sc pieces" << '\n';
-                for (auto const [key, val] : gemToStatsMap)
+                else if(val == 5)
                 {
-                    double gemCost = calcImbueCostStat(key);
-                    if (((bonusCap - (currentAcu + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+                    for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        gems.push_back(val + " dusty essence");
-                        currentAcu = currentAcu + key;
-                        totalImbueCost = totalImbueCost + gemCost;
-                        break;
-                    }
-                    if (((bonusCap - (currentAcu + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
-                    {
-                        gems.push_back(val + " dusty essence");
-                        currentAcu = currentAcu + key;
-                        totalImbueCost = totalImbueCost + gemCost;
-                        break;
+                        if (key == key2)
+                        {
+                            std::string gemPrefix { };
+                            std::string gemStat { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 10)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 16)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 19)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 22)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 25)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 28)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available
+                                if (deficit >= 50)
+                                {
+                                    gemPrefix = "perfect";
+                                }
+                                // Choose a 3/4 value (22) to conserve available imbue points while pumping stats
+                                else if (deficit >= 35)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                // Choose a median value (16) to conserve available imbue points
+                                else if (deficit >= 15)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : statsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemStat = val3;
+                                }
+                            }
+                            int cost { };
+                            int bonus { };
+                            
+                            for (auto const [key4, val4]: gemToStatsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostStat(bonus);
+                                }
+                            }
+                            
+                            gemName = gemPrefix + " " + gemStat;
+                            if (key == "Strength")
+                            {
+                                currentStr = currentStr + bonus;
+                            }
+                            if (key == "Dexterity")
+                            {
+                                currentDex = currentDex + bonus;
+                            }
+                            if (key == "Constitution")
+                            {
+                                currentCon = currentCon + bonus;
+                            }
+                            if (key == "Quickness")
+                            {
+                                currentQui = currentQui + bonus;
+                            }
+                            if (key == "Acuity")
+                            {
+                                currentAcu = currentAcu + bonus;
+                            }
+                            totalImbueCost = totalImbueCost + cost;
+                            
+                            gems.push_back(gemName);
+                        }
                     }
                 }
             }
         }
-        
         createTemplateTable();
         std::cout << "SC Piece #" << i + 1 << '\n';
         for(auto const entry : gems)
@@ -602,8 +1050,154 @@ int main()
     getNeededStats();
     getCurrentStats();
     getCurrentResists();
+    prioritizeStats();
     createTemplateTable();
     scCalculator();
 
     return 0;
 }
+
+
+/* old SC calc
+if (neededStats[n] == "Strength")
+{
+    std::cout << "Need " << bonusCap - currentStr << " strength from " << SCPieces << " sc pieces" << '\n';
+    for (auto const [key, val] : gemToStatsMap)
+    {
+        double gemCost = calcImbueCostStat(key);
+        if (((bonusCap - (currentStr + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+        {
+            gems.push_back(val + " fiery essence");
+            currentStr = currentStr + key;
+            totalImbueCost = totalImbueCost + gemCost;
+            if ((imbueCap - (totalImbueCost)) < 3)
+            {
+                break;
+            }
+        }
+        if (((bonusCap - (currentStr + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
+        {
+            gems.push_back(val + " fiery essence");
+            currentStr = currentStr + key;
+            totalImbueCost = totalImbueCost + gemCost;
+            if ((imbueCap - (totalImbueCost)) < 3)
+            {
+                break;
+            }
+        }
+    }
+}
+if (neededStats[n] == "Dexterity")
+{
+    std::cout << "Need " << bonusCap - currentDex << " dexterity from " << SCPieces << " sc pieces" << '\n';
+    for (auto const [key, val] : gemToStatsMap)
+    {
+        double gemCost = calcImbueCostStat(key);
+        if (((bonusCap - (currentDex + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+        {
+            gems.push_back(val + " vapor essence");
+            currentDex = currentDex + key;
+            totalImbueCost = totalImbueCost + gemCost;
+            if ((imbueCap - (totalImbueCost)) < 3)
+            {
+                break;
+            }
+        }
+        if (((bonusCap - (currentDex + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
+        {
+            gems.push_back(val + " vapor essence");
+            currentDex = currentDex + key;
+            totalImbueCost = totalImbueCost + gemCost;
+            if ((imbueCap - (totalImbueCost)) < 3)
+            {
+                break;
+            }
+        }
+    }
+}
+if (neededStats[n] == "Quickness")
+{
+    std::cout << "Need " << bonusCap - currentQui << " quickness from " << SCPieces << " sc pieces" << '\n';
+    for (auto const [key, val] : gemToStatsMap)
+    {
+        double gemCost = calcImbueCostStat(key);
+        if (((bonusCap - (currentQui + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+        {
+            gems.push_back(val + " airy essence");
+            currentQui = currentQui + key;
+            totalImbueCost = totalImbueCost + gemCost;
+            if ((imbueCap - (totalImbueCost)) < 3)
+            {
+                break;
+            }
+        }
+        if (((bonusCap - (currentQui + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
+        {
+            gems.push_back(val + " airy essence");
+            currentQui = currentQui + key;
+            totalImbueCost = totalImbueCost + gemCost;
+            if ((imbueCap - (totalImbueCost)) < 3)
+            {
+                break;
+            }
+        }
+    }
+}
+if (neededStats[n] == "Constitution")
+{
+    std::cout << "Need " << bonusCap - currentCon << " constitution from " << SCPieces << " sc pieces" << '\n';
+    for (auto const [key, val] : gemToStatsMap)
+    {
+        double gemCost = calcImbueCostStat(key);
+        if (((bonusCap - (currentCon + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+        {
+            gems.push_back(val + " earthen essence");
+            currentCon = currentCon + key;
+            totalImbueCost = totalImbueCost + gemCost;
+            if ((imbueCap - (totalImbueCost)) < 3)
+            {
+                break;
+            }
+        }
+        if (((bonusCap - (currentCon + key)) > 9) && (key >= 16))
+        {
+            gems.push_back(val + " earthen essence");
+            currentCon = currentCon + key;
+            totalImbueCost = totalImbueCost + gemCost;
+            if ((imbueCap - (totalImbueCost)) < 3)
+            {
+                break;
+            }
+        }
+    }
+}
+if (neededStats[n] == "Acuity")
+{
+    std::cout << "Need " << bonusCap - currentAcu << " acuity from " << SCPieces << " sc pieces" << '\n';
+    for (auto const [key, val] : gemToStatsMap)
+    {
+        double gemCost = calcImbueCostStat(key);
+        if (((bonusCap - (currentAcu + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+        {
+            gems.push_back(val + " dusty essence");
+            currentAcu = currentAcu + key;
+            totalImbueCost = totalImbueCost + gemCost;
+            //
+            if ((imbueCap - (totalImbueCost)) < 3)
+            {
+                break;
+            }
+        }
+        if (((bonusCap - (currentAcu + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
+        {
+            gems.push_back(val + " dusty essence");
+            currentAcu = currentAcu + key;
+            totalImbueCost = totalImbueCost + gemCost;
+            if ((imbueCap - (totalImbueCost)) < 3)
+            {
+                break;
+            }
+        }
+    }
+}
+*/
