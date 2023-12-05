@@ -497,6 +497,8 @@ int scCalculator()
                             std::string gemName { };
                             int bonusValue { };
                             int deficit = val2;
+                            int cost { };
+                            int bonus { };
                             // If cap can be reached for any stats with exact values starting at 10, consume a gem
                             if (deficit == 10)
                             {
@@ -555,9 +557,7 @@ int scCalculator()
                                     gemStat = val3;
                                 }
                             }
-                            int cost { };
-                            int bonus { };
-                            
+
                             for (auto const [key4, val4]: gemToStatsMap)
                             {
                                 if (gemPrefix == val4)
@@ -566,7 +566,7 @@ int scCalculator()
                                     cost = calcImbueCostStat(bonus);
                                 }
                             }
-                            
+
                             gemName = gemPrefix + " " + gemStat;
                             if (key == "Strength")
                             {
@@ -588,9 +588,18 @@ int scCalculator()
                             {
                                 currentAcu = currentAcu + bonus;
                             }
+
                             totalImbueCost = totalImbueCost + cost;
-                            
-                            gems.push_back(gemName);
+
+                            /*if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                
+                            }
+                            */
                         }
                     }
                 }
