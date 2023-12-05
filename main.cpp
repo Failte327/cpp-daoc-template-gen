@@ -13,6 +13,7 @@ std::map<int, std::string> gemToSkillMap { };
 std::map<std::string, int> statRankingsMap { };
 std::map<std::string, std::string> statsMap { };
 std::map<std::string, std::string> resistsMap { };
+std::map<std::string, int> currentResistsMap { };
 std::map<std::string, std::string> bonusMap { };
 std::map<std::string, std::vector<std::string>> scPiecesGems { };
 
@@ -35,6 +36,44 @@ std::vector<std::string> neededStats{ };
 std::string templateName{ };
 std::vector allStats{"str", "con", "dex", "qui", "acu"};
 std::vector resists{"crush", "slash", "thrust", "heat", "cold", "matter", "energy", "body", "spirit"};
+
+int getCurrentResists()
+{
+    for (auto const entry : resists)
+    {
+        int resist {};
+        std::cout << "Enter current " << entry << " resist";
+        std::cin >> resist;
+        currentResistsMap[entry] = resist;
+    }
+
+    tabulate::Table resistsTable{ };
+    int tableRows = 1;
+
+    resistsTable.add_row({"Resist", "Value"});
+    resistsTable.row(0).format()
+      .font_color(tabulate::Color::white)
+      .font_align(tabulate::FontAlign::center)
+      .font_style({tabulate::FontStyle::bold});
+
+    for(auto const [key, val] : currentResistsMap)
+    {
+        resistsTable.add_row({key, std::to_string(val)});
+        tableRows++;
+    }
+
+    for(int i = 1; i < tableRows; i++)
+    {
+        resistsTable.row(i).format()
+            .font_color(tabulate::Color::green)
+            .font_align(tabulate::FontAlign::center)
+            .font_style({tabulate::FontStyle::bold});
+    }
+
+    std::cout << resistsTable;
+
+    return 0;
+}
 
 int createSCMaps()
 {
@@ -562,6 +601,7 @@ int main()
     getNumberOfGearPieces();
     getNeededStats();
     getCurrentStats();
+    getCurrentResists();
     createTemplateTable();
     scCalculator();
 
