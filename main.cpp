@@ -2,6 +2,8 @@
 #include <vector>
 #include <map>
 #include <tabulate/table.hpp>
+#include <math.h> 
+#include <stdio.h> 
 
 std::map<int, std::string> gemToStatsMap { };
 std::map<int, std::string> gemToResistsMap { };
@@ -15,6 +17,7 @@ std::map<std::string, std::string> bonusMap { };
 std::map<std::string, std::vector<std::string>> scPiecesGems { };
 
 int bonusCap = 104;
+double imbueCap = 37.5;
 int SCPieces{ };
 int currentStr { };
 int currentCon { };
@@ -27,6 +30,7 @@ bool needCon { };
 bool needDex { };
 bool needQui { };
 bool needAcu { };
+std::vector<std::string> neededStats{ };
 
 std::string templateName{ };
 std::vector allStats{"str", "con", "dex", "qui", "acu"};
@@ -45,27 +49,17 @@ int createSCMaps()
     gemToStatsMap[25] = "flawless";
     gemToStatsMap[28] = "perfect";
 
-    for (auto const [key, val] : gemToStatsMap)
-    {
-        std::cout << key << ": " << val << '\n';
-    }
-
     statsMap["str"] = "fiery essence";
     statsMap["dex"] = "vapor essence";
     statsMap["qui"] = "airy essence";
     statsMap["con"] = "earthen essence";
-    statsMap["int"] =  "dusty essence";
+    statsMap["int"] = "dusty essence";
     statsMap["pie"] = "watery essence";
     statsMap["emp"] = "heated essence";
     statsMap["cha"] = "icy essence";
 
-    for (auto const [key, val] : statsMap)
-    {
-        std::cout << key << ": " << val << '\n';
-    }
-
     resistsMap["body"] = "dusty shielding";
-    resistsMap["cold"] = "icyshielding";
+    resistsMap["cold"] = "icy shielding";
     resistsMap["heat"] = "heated shielding";
     resistsMap["energy"] = "light shielding";
     resistsMap["matter"] = "earthen shielding";
@@ -73,11 +67,6 @@ int createSCMaps()
     resistsMap["thrust"] = "airy shielding";
     resistsMap["crush"] = "fiery shielding";
     resistsMap["slash"] = "watery shielding";
-
-    for(auto const [key, val] : resistsMap)
-    {
-        std::cout << key << ": " << val << '\n';
-    }
 
     gemToResistsMap[1] = "raw";
     gemToResistsMap[2] = "uncut";
@@ -90,11 +79,6 @@ int createSCMaps()
     gemToResistsMap[15] = "flawless";
     gemToResistsMap[17] = "perfect";
 
-    for(auto const [key, val] : gemToResistsMap)
-    {
-        std::cout << key << ": " << val << '\n';
-    }
-
     gemToHitsMap[4] = "raw";
     gemToHitsMap[12] = "uncut";
     gemToHitsMap[20] = "rough";
@@ -105,11 +89,6 @@ int createSCMaps()
     gemToHitsMap[60] = "precious";
     gemToHitsMap[68] = "flawless";
     gemToHitsMap[76] = "perfect";
-
-    for(auto const [key, val] : gemToHitsMap)
-    {
-        std::cout << key << ": " << val << '\n';
-    }
 
     gemToPowerMap[1] = "raw";
     gemToPowerMap[2] = "uncut";
@@ -122,18 +101,8 @@ int createSCMaps()
     gemToPowerMap[15] = "flawless";
     gemToPowerMap[17] = "perfect";
 
-    for(auto const [key, val] : gemToPowerMap)
-    {
-        std::cout << key << ": " << val << '\n';
-    }
-
     bonusMap["hits"] = "blood essence";
     bonusMap["power"] = "mystic essence";
-
-    for(auto const [key, val] : bonusMap)
-    {
-        std::cout << key << ": " << val << '\n';
-    }
 
     gemToSkillMap[1] = "raw";
     gemToSkillMap[2] = "uncut";
@@ -143,11 +112,6 @@ int createSCMaps()
     gemToSkillMap[6] = "polished";
     gemToSkillMap[7] = "faceted";
     gemToSkillMap[8] = "precious";
-
-    for(auto const [key, val] : gemToSkillMap)
-    {
-        std::cout << key << ": " << val << '\n';
-    }
 
     return 0;
 }
@@ -185,6 +149,7 @@ int getNeededStats()
 
     if (strAnswer == "y")
     {
+        neededStats.push_back("Strength");
         needStr = true;
     }
     else
@@ -199,6 +164,7 @@ int getNeededStats()
 
     if (conAnswer == "y")
     {
+        neededStats.push_back("Constitution");
         needCon = true;
     }
     else
@@ -212,6 +178,7 @@ int getNeededStats()
 
     if (dexAnswer == "y")
     {
+        neededStats.push_back("Dexterity");
         needDex = true;
     }
     else
@@ -225,6 +192,7 @@ int getNeededStats()
 
     if (quiAnswer == "y")
     {
+        neededStats.push_back("Quickness");
         needQui = true;
     }
     else
@@ -238,6 +206,7 @@ int getNeededStats()
 
     if (acuAnswer == "y")
     {
+        neededStats.push_back("Acuity");
         needAcu = true;
     }
     else
@@ -351,7 +320,7 @@ int getCurrentStats()
 int getTemplateTitle() {
 
     std::cout << "What would you like to name this template? " << '\n';
-    std::cin >> templateName;
+    std::getline(std::cin, templateName);
     std::cout << "Creating " << templateName << " template" << '\n';
     
     return 0;
@@ -417,7 +386,6 @@ double calcImbueCostStat(int bonusValue)
 {
 
     double imbueCost = (bonusValue - 1) * 2 / 3 + 1;
-    std::cout << "Imbue cost: " << imbueCost << '\n';
 
     return imbueCost;
 }
@@ -426,7 +394,6 @@ double calcImbueCostPower(int bonusValue)
 {
 
     double imbueCost = (bonusValue * 2) - 2;
-    std::cout << "Imbue cost: " << imbueCost << '\n';
 
     return imbueCost;
 }
@@ -435,7 +402,6 @@ double calcImbueCostHealth(int bonusValue)
 {
 
     double imbueCost = bonusValue / 4;
-    std::cout << "Imbue cost: " << imbueCost << '\n';
 
     return imbueCost;
 }
@@ -443,7 +409,6 @@ double calcImbueCostHealth(int bonusValue)
 double calcImbueCostResist(int bonusValue)
 {
     double imbueCost = (bonusValue * 2) - 2;
-    std::cout << "Imbue cost: " << imbueCost << '\n';
 
     return imbueCost;
 }
@@ -451,7 +416,6 @@ double calcImbueCostResist(int bonusValue)
 double calcImbueCostSkill(int bonusValue)
 {
     double imbueCost = (bonusValue - 1) * 5;
-    std::cout << "Imbue cost: " << imbueCost << '\n';
 
     return imbueCost;
 }
@@ -461,8 +425,129 @@ int scCalculator()
 
     for(int i = 0; i < SCPieces; i++)
     {
+        double totalImbueCost = 0.0;
         std::vector<std::string> gems{ };
+        for(int n = 0; n < neededStats.size(); n++)
+        {
+            if (neededStats[n] == "Strength")
+            {
+                std::cout << "Need " << bonusCap - currentStr << " strength from " << SCPieces << " sc pieces" << '\n';
+                for (auto const [key, val] : gemToStatsMap)
+                {
+                    double gemCost = calcImbueCostStat(key);
+                    if (((bonusCap - (currentStr + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+                    {
+                        gems.push_back(val + " fiery essence");
+                        currentStr = currentStr + key;
+                        totalImbueCost = totalImbueCost + gemCost;
+                        break;
+                    }
+                    if (((bonusCap - (currentStr + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
+                    {
+                        gems.push_back(val + " fiery essence");
+                        currentStr = currentStr + key;
+                        totalImbueCost = totalImbueCost + gemCost;
+                        break;
+                    }
+                }
+            }
+            if (neededStats[n] == "Dexterity")
+            {
+                std::cout << "Need " << bonusCap - currentDex << " dexterity from " << SCPieces << " sc pieces" << '\n';
+                for (auto const [key, val] : gemToStatsMap)
+                {
+                    double gemCost = calcImbueCostStat(key);
+                    if (((bonusCap - (currentDex + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+                    {
+                        gems.push_back(val + " vapor essence");
+                        currentDex = currentDex + key;
+                        totalImbueCost = totalImbueCost + gemCost;
+                        break;
+                    }
+                    if (((bonusCap - (currentDex + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
+                    {
+                        gems.push_back(val + " vapor essence");
+                        currentDex = currentDex + key;
+                        totalImbueCost = totalImbueCost + gemCost;
+                        break;
+                    }
+                }
+            }
+            if (neededStats[n] == "Quickness")
+            {
+                std::cout << "Need " << bonusCap - currentQui << " quickness from " << SCPieces << " sc pieces" << '\n';
+                for (auto const [key, val] : gemToStatsMap)
+                {
+                    double gemCost = calcImbueCostStat(key);
+                    if (((bonusCap - (currentQui + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+                    {
+                        gems.push_back(val + " airy essence");
+                        currentQui = currentQui + key;
+                        totalImbueCost = totalImbueCost + gemCost;
+                        break;
+                    }
+                    if (((bonusCap - (currentQui + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
+                    {
+                        gems.push_back(val + " airy essence");
+                        currentQui = currentQui + key;
+                        totalImbueCost = totalImbueCost + gemCost;
+                        break;
+                    }
+                }
+            }
+            if (neededStats[n] == "Constitution")
+            {
+                std::cout << "Need " << bonusCap - currentCon << " constitution from " << SCPieces << " sc pieces" << '\n';
+                for (auto const [key, val] : gemToStatsMap)
+                {
+                    double gemCost = calcImbueCostStat(key);
+                    if (((bonusCap - (currentCon + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+                    {
+                        gems.push_back(val + " earthen essence");
+                        currentCon = currentCon + key;
+                        totalImbueCost = totalImbueCost + gemCost;
+                        break;
+                    }
+                    if (((bonusCap - (currentCon + key)) > 9) && (key >= 16))
+                    {
+                        gems.push_back(val + " earthen essence");
+                        currentCon = currentCon + key;
+                        totalImbueCost = totalImbueCost + gemCost;
+                        break;
+                    }
+                }
+            }
+            if (neededStats[n] == "Acuity")
+            {
+                std::cout << "Need " << bonusCap - currentAcu << " acuity from " << SCPieces << " sc pieces" << '\n';
+                for (auto const [key, val] : gemToStatsMap)
+                {
+                    double gemCost = calcImbueCostStat(key);
+                    if (((bonusCap - (currentAcu + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
+                    {
+                        gems.push_back(val + " dusty essence");
+                        currentAcu = currentAcu + key;
+                        totalImbueCost = totalImbueCost + gemCost;
+                        break;
+                    }
+                    if (((bonusCap - (currentAcu + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
+                    {
+                        gems.push_back(val + " dusty essence");
+                        currentAcu = currentAcu + key;
+                        totalImbueCost = totalImbueCost + gemCost;
+                        break;
+                    }
+                }
+            }
+        }
         
+        createTemplateTable();
+        std::cout << "SC Piece #" << i + 1 << '\n';
+        for(auto const entry : gems)
+        {
+            std::cout << entry << '\n';
+        }
+        std::cout << "End Imbue Cost = " << totalImbueCost << '\n';
     }
 
     return 0;
@@ -478,8 +563,7 @@ int main()
     getNeededStats();
     getCurrentStats();
     createTemplateTable();
-    // getStatRankings();
-
+    scCalculator();
 
     return 0;
 }
