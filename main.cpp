@@ -530,20 +530,18 @@ int scCalculator()
                             }
                             else 
                             {
-                                // If the deficit is large, pump stats in while imbue points are available
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
                                 if (deficit >= 50)
-                                {
-                                    gemPrefix = "perfect";
-                                }
-                                // Choose a 3/4 value (22) to conserve available imbue points while pumping stats
-                                else if (deficit >= 35)
                                 {
                                     gemPrefix = "precious";
                                 }
-                                // Choose a median value (16) to conserve available imbue points
-                                else if (deficit >= 15)
+                                else if (deficit >= 35)
                                 {
                                     gemPrefix = "polished";
+                                }
+                                else if (deficit >= 15)
+                                {
+                                    gemPrefix = "imperfect";
                                 }
                                 else
                                 {
@@ -645,20 +643,18 @@ int scCalculator()
                             }
                             else 
                             {
-                                // If the deficit is large, pump stats in while imbue points are available
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
                                 if (deficit >= 50)
-                                {
-                                    gemPrefix = "perfect";
-                                }
-                                // Choose a 3/4 value (22) to conserve available imbue points while pumping stats
-                                else if (deficit >= 35)
                                 {
                                     gemPrefix = "precious";
                                 }
-                                // Choose a median value (16) to conserve available imbue points
-                                else if (deficit >= 15)
+                                else if (deficit >= 35)
                                 {
                                     gemPrefix = "polished";
+                                }
+                                else if (deficit >= 15)
+                                {
+                                    gemPrefix = "imperfect";
                                 }
                                 else
                                 {
@@ -753,20 +749,18 @@ int scCalculator()
                             }
                             else 
                             {
-                                // If the deficit is large, pump stats in while imbue points are available
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
                                 if (deficit >= 50)
-                                {
-                                    gemPrefix = "perfect";
-                                }
-                                // Choose a 3/4 value (22) to conserve available imbue points while pumping stats
-                                else if (deficit >= 35)
                                 {
                                     gemPrefix = "precious";
                                 }
-                                // Choose a median value (16) to conserve available imbue points
-                                else if (deficit >= 15)
+                                else if (deficit >= 35)
                                 {
                                     gemPrefix = "polished";
+                                }
+                                else if (deficit >= 15)
+                                {
+                                    gemPrefix = "imperfect";
                                 }
                                 else
                                 {
@@ -861,20 +855,18 @@ int scCalculator()
                             }
                             else 
                             {
-                                // If the deficit is large, pump stats in while imbue points are available
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
                                 if (deficit >= 50)
-                                {
-                                    gemPrefix = "perfect";
-                                }
-                                // Choose a 3/4 value (22) to conserve available imbue points while pumping stats
-                                else if (deficit >= 35)
                                 {
                                     gemPrefix = "precious";
                                 }
-                                // Choose a median value (16) to conserve available imbue points
-                                else if (deficit >= 15)
+                                else if (deficit >= 35)
                                 {
                                     gemPrefix = "polished";
+                                }
+                                else if (deficit >= 15)
+                                {
+                                    gemPrefix = "imperfect";
                                 }
                                 else
                                 {
@@ -969,20 +961,18 @@ int scCalculator()
                             }
                             else 
                             {
-                                // If the deficit is large, pump stats in while imbue points are available
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
                                 if (deficit >= 50)
-                                {
-                                    gemPrefix = "perfect";
-                                }
-                                // Choose a 3/4 value (22) to conserve available imbue points while pumping stats
-                                else if (deficit >= 35)
                                 {
                                     gemPrefix = "precious";
                                 }
-                                // Choose a median value (16) to conserve available imbue points
-                                else if (deficit >= 15)
+                                else if (deficit >= 35)
                                 {
                                     gemPrefix = "polished";
+                                }
+                                else if (deficit >= 15)
+                                {
+                                    gemPrefix = "imperfect";
                                 }
                                 else
                                 {
