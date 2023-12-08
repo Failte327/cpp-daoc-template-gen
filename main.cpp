@@ -21,7 +21,7 @@ std::map<std::string, std::vector<std::string>> scPiecesGems { };
 
 int bonusCap = 104;
 // This isn't the true imbue cap but for calculations it keeps it below the actual cap
-double imbueCap = 33;
+double imbueCap = 37.5;
 int resistCap = 26;
 int SCPieces{ };
 int currentStr { };
@@ -602,7 +602,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 5))
                         {
                             std::string gemPrefix { };
                             std::string gemStat { };
@@ -657,7 +657,7 @@ int scCalculator()
                                 }
                                 else
                                 {
-                                    gemPrefix = "flawed";
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : statsMap)
@@ -758,7 +758,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 5))
                         {
                             std::string gemPrefix { };
                             std::string gemStat { };
@@ -811,7 +811,7 @@ int scCalculator()
                                 }
                                 else
                                 {
-                                    gemPrefix = "flawed";
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : statsMap)
@@ -912,7 +912,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 5))
                         {
                             std::string gemPrefix { };
                             std::string gemStat { };
@@ -965,7 +965,7 @@ int scCalculator()
                                 }
                                 else
                                 {
-                                    gemPrefix = "flawed";
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : statsMap)
@@ -1066,7 +1066,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 5))
                         {
                             std::string gemPrefix { };
                             std::string gemStat { };
@@ -1119,7 +1119,7 @@ int scCalculator()
                                 }
                                 else
                                 {
-                                    gemPrefix = "flawed";
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : statsMap)
@@ -1220,7 +1220,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 5))
                         {
                             std::string gemPrefix { };
                             std::string gemStat { };
@@ -1273,7 +1273,7 @@ int scCalculator()
                                 }
                                 else
                                 {
-                                    gemPrefix = "flawed";
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : statsMap)
@@ -1381,7 +1381,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: resistsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 3))
                         {
                             std::string gemPrefix { };
                             std::string gemResist { };
@@ -1411,15 +1411,6 @@ int scCalculator()
                             {
                                 gemPrefix = "precious";
                             }
-                            if (deficit == 15)
-                            {
-                                gemPrefix = "flawless";
-                            }
-                            if (deficit == 17)
-                            {
-                                gemPrefix = "perfect";
-                            }
-
                             else 
                             {
                                 // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
@@ -1431,9 +1422,13 @@ int scCalculator()
                                 {
                                     gemPrefix = "polished";
                                 }
-                                else
+                                else if (deficit >= 9)
                                 {
                                     gemPrefix = "flawed";
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : resistsMap)
@@ -1471,7 +1466,7 @@ int scCalculator()
                             }
                             else
                             {
-                                bonus = bonus - 6;
+                                bonus = bonus - 4;
                                 cost = scCalcRecursionResist(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
@@ -1516,7 +1511,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: resistsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 3))
                         {
                             std::string gemPrefix { };
                             std::string gemResist { };
@@ -1546,14 +1541,6 @@ int scCalculator()
                             {
                                 gemPrefix = "precious";
                             }
-                            if (deficit == 15)
-                            {
-                                gemPrefix = "flawless";
-                            }
-                            if (deficit == 17)
-                            {
-                                gemPrefix = "perfect";
-                            }
                             else 
                             {
                                 // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
@@ -1565,9 +1552,13 @@ int scCalculator()
                                 {
                                     gemPrefix = "polished";
                                 }
-                                else
+                                else if (deficit >= 9)
                                 {
                                     gemPrefix = "flawed";
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : resistsMap)
@@ -1604,7 +1595,7 @@ int scCalculator()
                             }
                             else
                             {
-                                bonus = bonus - 6;
+                                bonus = bonus - 4;
                                 cost = scCalcRecursionResist(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
@@ -1642,7 +1633,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: resistsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 3))
                         {
                             std::string gemPrefix { };
                             std::string gemResist { };
@@ -1672,14 +1663,6 @@ int scCalculator()
                             {
                                 gemPrefix = "precious";
                             }
-                            if (deficit == 15)
-                            {
-                                gemPrefix = "flawless";
-                            }
-                            if (deficit == 17)
-                            {
-                                gemPrefix = "perfect";
-                            }
                             else 
                             {
                                 // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
@@ -1691,9 +1674,13 @@ int scCalculator()
                                 {
                                     gemPrefix = "polished";
                                 }
-                                else
+                                else if (deficit >= 9)
                                 {
                                     gemPrefix = "flawed";
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : resistsMap)
@@ -1730,7 +1717,7 @@ int scCalculator()
                             }
                             else
                             {
-                                bonus = bonus - 6;
+                                bonus = bonus - 4;
                                 cost = scCalcRecursionResist(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
@@ -1768,7 +1755,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: resistsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 3))
                         {
                             std::string gemPrefix { };
                             std::string gemResist { };
@@ -1798,36 +1785,6 @@ int scCalculator()
                             {
                                 gemPrefix = "precious";
                             }
-                            if (deficit == 15)
-                            {
-                                gemPrefix = "flawless";
-                            }
-                            if (deficit == 17)
-                            {
-                                gemPrefix = "perfect";
-                            }
-                            /*
-                                resistsMap["body"] = "dusty shielding";
-                                resistsMap["cold"] = "icy shielding";
-                                resistsMap["heat"] = "heated shielding";
-                                resistsMap["energy"] = "light shielding";
-                                resistsMap["matter"] = "earthen shielding";
-                                resistsMap["spirit"] = "vapor shielding";
-                                resistsMap["thrust"] = "airy shielding";
-                                resistsMap["crush"] = "fiery shielding";
-                                resistsMap["slash"] = "watery shielding";
-
-                                gemToResistsMap[1] = "raw";
-                                gemToResistsMap[2] = "uncut";
-                                gemToResistsMap[3] = "rough";
-                                gemToResistsMap[5] = "flawed";
-                                gemToResistsMap[7] = "imperfect";
-                                gemToResistsMap[9] = "polished";
-                                gemToResistsMap[11] = "faceted";
-                                gemToResistsMap[13] = "precious";
-                                gemToResistsMap[15] = "flawless";
-                                gemToResistsMap[17] = "perfect";
-                            */
                             else 
                             {
                                 // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
@@ -1839,9 +1796,13 @@ int scCalculator()
                                 {
                                     gemPrefix = "polished";
                                 }
-                                else
+                                else if (deficit >= 9)
                                 {
                                     gemPrefix = "flawed";
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : resistsMap)
@@ -1878,7 +1839,7 @@ int scCalculator()
                             }
                             else
                             {
-                                bonus = bonus - 6;
+                                bonus = bonus - 4;
                                 cost = scCalcRecursionResist(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
@@ -1916,7 +1877,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: resistsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 3))
                         {
                             std::string gemPrefix { };
                             std::string gemResist { };
@@ -1946,14 +1907,6 @@ int scCalculator()
                             {
                                 gemPrefix = "precious";
                             }
-                            if (deficit == 15)
-                            {
-                                gemPrefix = "flawless";
-                            }
-                            if (deficit == 17)
-                            {
-                                gemPrefix = "perfect";
-                            }
                             else 
                             {
                                 // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
@@ -1965,9 +1918,13 @@ int scCalculator()
                                 {
                                     gemPrefix = "polished";
                                 }
-                                else
+                                else if (deficit >= 9)
                                 {
                                     gemPrefix = "flawed";
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : resistsMap)
@@ -2004,7 +1961,7 @@ int scCalculator()
                             }
                             else
                             {
-                                bonus = bonus - 6;
+                                bonus = bonus - 4;
                                 cost = scCalcRecursionResist(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
@@ -2042,7 +1999,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: resistsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 3))
                         {
                             std::string gemPrefix { };
                             std::string gemResist { };
@@ -2072,14 +2029,6 @@ int scCalculator()
                             {
                                 gemPrefix = "precious";
                             }
-                            if (deficit == 15)
-                            {
-                                gemPrefix = "flawless";
-                            }
-                            if (deficit == 17)
-                            {
-                                gemPrefix = "perfect";
-                            }
                             else 
                             {
                                 // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
@@ -2091,9 +2040,13 @@ int scCalculator()
                                 {
                                     gemPrefix = "polished";
                                 }
-                                else
+                                else if (deficit >= 9)
                                 {
                                     gemPrefix = "flawed";
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : resistsMap)
@@ -2130,7 +2083,7 @@ int scCalculator()
                             }
                             else
                             {
-                                bonus = bonus - 6;
+                                bonus = bonus - 4;
                                 cost = scCalcRecursionResist(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
@@ -2168,7 +2121,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: resistsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 3))
                         {
                             std::string gemPrefix { };
                             std::string gemResist { };
@@ -2198,14 +2151,6 @@ int scCalculator()
                             {
                                 gemPrefix = "precious";
                             }
-                            if (deficit == 15)
-                            {
-                                gemPrefix = "flawless";
-                            }
-                            if (deficit == 17)
-                            {
-                                gemPrefix = "perfect";
-                            }
                             else 
                             {
                                 // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
@@ -2217,9 +2162,13 @@ int scCalculator()
                                 {
                                     gemPrefix = "polished";
                                 }
-                                else
+                                else if (deficit >= 9)
                                 {
                                     gemPrefix = "flawed";
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : resistsMap)
@@ -2256,7 +2205,7 @@ int scCalculator()
                             }
                             else
                             {
-                                bonus = bonus - 6;
+                                bonus = bonus - 4;
                                 cost = scCalcRecursionResist(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
@@ -2294,7 +2243,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: resistsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 3))
                         {
                             std::string gemPrefix { };
                             std::string gemResist { };
@@ -2324,14 +2273,6 @@ int scCalculator()
                             {
                                 gemPrefix = "precious";
                             }
-                            if (deficit == 15)
-                            {
-                                gemPrefix = "flawless";
-                            }
-                            if (deficit == 17)
-                            {
-                                gemPrefix = "perfect";
-                            }
                             else 
                             {
                                 // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
@@ -2343,9 +2284,13 @@ int scCalculator()
                                 {
                                     gemPrefix = "polished";
                                 }
-                                else
+                                else if (deficit >= 9)
                                 {
                                     gemPrefix = "flawed";
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : resistsMap)
@@ -2382,7 +2327,7 @@ int scCalculator()
                             }
                             else
                             {
-                                bonus = bonus - 6;
+                                bonus = bonus - 4;
                                 cost = scCalcRecursionResist(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
@@ -2420,7 +2365,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: resistsToCurrentDeficitMap)
                     {
-                        if ((key == key2) && (val2 > 0))
+                        if ((key == key2) && (val2 > 3))
                         {
                             std::string gemPrefix { };
                             std::string gemResist { };
@@ -2450,14 +2395,6 @@ int scCalculator()
                             {
                                 gemPrefix = "precious";
                             }
-                            if (deficit == 15)
-                            {
-                                gemPrefix = "flawless";
-                            }
-                            if (deficit == 17)
-                            {
-                                gemPrefix = "perfect";
-                            }
                             else 
                             {
                                 // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
@@ -2469,9 +2406,13 @@ int scCalculator()
                                 {
                                     gemPrefix = "polished";
                                 }
-                                else
+                                else if (deficit >= 9)
                                 {
                                     gemPrefix = "flawed";
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
                             for (auto const [key3, val3] : resistsMap)
@@ -2508,7 +2449,7 @@ int scCalculator()
                             }
                             else
                             {
-                                bonus = bonus - 6;
+                                bonus = bonus - 4;
                                 cost = scCalcRecursionResist(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
