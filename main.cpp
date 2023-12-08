@@ -18,7 +18,8 @@ std::map<std::string, std::string> bonusMap { };
 std::map<std::string, std::vector<std::string>> scPiecesGems { };
 
 int bonusCap = 104;
-double imbueCap = 37.5;
+// This isn't the true imbue cap but for calculations it keeps it below
+double imbueCap = 33;
 int SCPieces{ };
 int currentStr { };
 int currentCon { };
@@ -475,6 +476,14 @@ double calcImbueCostSkill(int bonusValue)
     return imbueCost;
 }
 
+int scCalcRecursion(int bonus)
+{
+
+    int cost = calcImbueCostStat(bonus);
+
+    return cost;
+}
+
 int scCalculator()
 {
 
@@ -589,15 +598,56 @@ int scCalculator()
 
                             totalImbueCost = totalImbueCost + cost;
 
-                            /*if (totalImbueCost <= imbueCap)
+                            if (totalImbueCost <= imbueCap)
                             {
                                 gems.push_back(gemName);
                             }
                             else
                             {
-                                
+                                bonus = bonus - 6;
+                                cost = scCalcRecursion(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToStatsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : statsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemStat = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemStat;
+                                    if (key == "Strength")
+                                    {
+                                        currentStr = currentStr + bonus;
+                                    }
+                                    if (key == "Dexterity")
+                                    {
+                                        currentDex = currentDex + bonus;
+                                    }
+                                    if (key == "Constitution")
+                                    {
+                                        currentCon = currentCon + bonus;
+                                    }
+                                    if (key == "Quickness")
+                                    {
+                                        currentQui = currentQui + bonus;
+                                    }
+                                    if (key == "Acuity")
+                                    {
+                                        currentAcu = currentAcu + bonus;
+                                    }
+                                    gems.push_back(gemName);
+                                }
                             }
-                            */
+                            
                         }
                     }
                 }
