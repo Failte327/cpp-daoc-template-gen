@@ -9,8 +9,10 @@ std::map<int, std::string> gemToHitsMap { };
 std::map<int, std::string> gemToPowerMap { };
 std::map<int, std::string> gemToSkillMap { };
 std::map<std::string, int> statRankingsMap { };
+std::map<std::string, int> resistRankingsMap { };
 std::map<std::string, std::string> statsMap { };
 std::map<std::string, int> statsToCurrentDeficitMap { };
+std::map<std::string, int> resistsToCurrentDeficitMap { };
 std::map<std::string, std::string> statsToCurrentMap { };
 std::map<std::string, std::string> resistsMap { };
 std::map<std::string, int> currentResistsMap { };
@@ -18,8 +20,9 @@ std::map<std::string, std::string> bonusMap { };
 std::map<std::string, std::vector<std::string>> scPiecesGems { };
 
 int bonusCap = 104;
-// This isn't the true imbue cap but for calculations it keeps it below
+// This isn't the true imbue cap but for calculations it keeps it below the actual cap
 double imbueCap = 33;
+int resistCap = 26;
 int SCPieces{ };
 int currentStr { };
 int currentCon { };
@@ -102,11 +105,6 @@ int prioritizeStats()
         }
     }
 
-    for(auto const [key, val] : statRankingsMap)
-    {
-        std::cout << key << ": " << val;
-    }
-
     return 0;
 }
 
@@ -144,6 +142,89 @@ int getCurrentResists()
     }
 
     std::cout << resistsTable;
+
+    return 0;
+}
+
+int prioritizeResists()
+{
+    int crushDeficit {};
+    int slashDeficit {};
+    int thrustDeficit {};
+    int heatDeficit {};
+    int coldDeficit {};
+    int matterDeficit {};
+    int spiritDeficit {};
+    int bodyDeficit {};
+    int energyDeficit {};
+    std::vector<std::string> resistScores {};
+    for(auto const [key, val] : currentResistsMap)
+    {
+        if (key == "crush")
+        {
+            crushDeficit = resistCap - val;
+            resistsToCurrentDeficitMap[key] = crushDeficit;
+        }
+        if (key == "slash")
+        {
+            slashDeficit = resistCap - val;
+            resistsToCurrentDeficitMap[key] = slashDeficit;
+        }
+        if (key == "thrust")
+        {
+           thrustDeficit = resistCap - val;
+           resistsToCurrentDeficitMap[key] = thrustDeficit;
+        }
+        if (key == "heat")
+        {
+            heatDeficit = resistCap - val;
+            resistsToCurrentDeficitMap[key] = heatDeficit;
+        }
+        if (key == "cold")
+        {
+            coldDeficit = resistCap - val;
+            resistsToCurrentDeficitMap[key] = coldDeficit;
+        }
+        if (key == "matter")
+        {
+            matterDeficit = resistCap - val;
+            resistsToCurrentDeficitMap[key] = matterDeficit;
+        }
+        if (key == "spirit")
+        {
+            spiritDeficit = resistCap - val;
+            resistsToCurrentDeficitMap[key] = spiritDeficit;
+        }
+        if (key == "energy")
+        {
+            energyDeficit = resistCap - val;
+            resistsToCurrentDeficitMap[key] = energyDeficit;
+        }
+        if (key == "body")
+        {
+            bodyDeficit = resistCap - val;
+            resistsToCurrentDeficitMap[key] = bodyDeficit;
+        }
+    }
+
+    for (auto const [key, val] : resistsToCurrentDeficitMap)
+    {
+        resistScores.push_back(std::to_string(val));
+    }
+
+    std::sort(resistScores.begin(), resistScores.end(), greater());
+
+    for(int i = 0; i < resistScores.size(); i++)
+    {
+        for(auto const [key, val]: resistsToCurrentDeficitMap)
+        {
+            if (resistScores[i] == std::to_string(val))
+            {
+                int rank = i + 1;
+                resistRankingsMap[key] = rank;
+            }
+        }
+    }
 
     return 0;
 }
@@ -386,11 +467,17 @@ int createTemplateTable()
 {
 
     tabulate::Table statsTable{ };
+    tabulate::Table resistsTable{ };
 
     int tableRows = 1;
 
     statsTable.add_row({"Stat", "Value"});
     statsTable.row(0).format()
+      .font_color(tabulate::Color::white)
+      .font_align(tabulate::FontAlign::center)
+      .font_style({tabulate::FontStyle::bold});
+    resistsTable.add_row({"Resist", "Value"});
+    resistsTable.row(0).format()
       .font_color(tabulate::Color::white)
       .font_align(tabulate::FontAlign::center)
       .font_style({tabulate::FontStyle::bold});
@@ -433,7 +520,14 @@ int createTemplateTable()
         .font_style({tabulate::FontStyle::bold});
     }
 
+    for(auto const [resist, value] : currentResistsMap)
+    {
+        int row = 1;
+        resistsTable.add_row({resist, std::to_string(value)});
+    }
+
     std::cout << statsTable << '\n';
+    std::cout << resistsTable << '\n';
 
     return 0;
 }
@@ -476,10 +570,18 @@ double calcImbueCostSkill(int bonusValue)
     return imbueCost;
 }
 
-int scCalcRecursion(int bonus)
+int scCalcRecursionStat(int bonus)
 {
 
     int cost = calcImbueCostStat(bonus);
+
+    return cost;
+}
+
+int scCalcRecursionResist(int bonus)
+{
+
+    int cost = calcImbueCostResist(bonus);
 
     return cost;
 }
@@ -491,15 +593,16 @@ int scCalculator()
     {
         double totalImbueCost = 0.0;
         std::vector<std::string> gems{ };
+        // Stats
         for(auto const [key, val] : statRankingsMap)
         {
-            if ((gems.size() < 5) && (totalImbueCost < imbueCap))
+            if ((gems.size() < 3) && (totalImbueCost < imbueCap))
             {
                 if(val == 1)
                 {
                     for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        if (key == key2)
+                        if ((key == key2) && (val2 > 0))
                         {
                             std::string gemPrefix { };
                             std::string gemStat { };
@@ -605,7 +708,7 @@ int scCalculator()
                             else
                             {
                                 bonus = bonus - 6;
-                                cost = scCalcRecursion(bonus);
+                                cost = scCalcRecursionStat(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
                                 {
@@ -655,7 +758,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        if (key == key2)
+                        if ((key == key2) && (val2 > 0))
                         {
                             std::string gemPrefix { };
                             std::string gemStat { };
@@ -760,7 +863,7 @@ int scCalculator()
                             else
                             {
                                 bonus = bonus - 6;
-                                cost = scCalcRecursion(bonus);
+                                cost = scCalcRecursionStat(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
                                 {
@@ -809,7 +912,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        if (key == key2)
+                        if ((key == key2) && (val2 > 0))
                         {
                             std::string gemPrefix { };
                             std::string gemStat { };
@@ -914,7 +1017,7 @@ int scCalculator()
                             else
                             {
                                 bonus = bonus - 6;
-                                cost = scCalcRecursion(bonus);
+                                cost = scCalcRecursionStat(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
                                 {
@@ -963,7 +1066,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        if (key == key2)
+                        if ((key == key2) && (val2 > 0))
                         {
                             std::string gemPrefix { };
                             std::string gemStat { };
@@ -1068,7 +1171,7 @@ int scCalculator()
                             else
                             {
                                 bonus = bonus - 6;
-                                cost = scCalcRecursion(bonus);
+                                cost = scCalcRecursionStat(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
                                 {
@@ -1117,7 +1220,7 @@ int scCalculator()
                 {
                     for (auto const [key2, val2]: statsToCurrentDeficitMap)
                     {
-                        if (key == key2)
+                        if ((key == key2) && (val2 > 0))
                         {
                             std::string gemPrefix { };
                             std::string gemStat { };
@@ -1222,7 +1325,7 @@ int scCalculator()
                             else
                             {
                                 bonus = bonus - 6;
-                                cost = scCalcRecursion(bonus);
+                                cost = scCalcRecursionStat(bonus);
                                 totalImbueCost = totalImbueCost + cost;
                                 if (totalImbueCost <= imbueCap)
                                 {
@@ -1269,6 +1372,1179 @@ int scCalculator()
                 }
             }
         }
+        // Resists
+        for (auto const [key, val] : resistRankingsMap) 
+        {
+            if ((gems.size() < 6) && (totalImbueCost < imbueCap))
+            {
+                if(val == 1)
+                {
+                    for (auto const [key2, val2]: resistsToCurrentDeficitMap)
+                    {
+                        if ((key == key2) && (val2 > 0))
+                        {
+                            std::string gemPrefix { };
+                            std::string gemResist { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            int cost { };
+                            int bonus { };
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 5)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 7)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 9)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 11)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 15)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 17)
+                            {
+                                gemPrefix = "perfect";
+                            }
+
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
+                                if (deficit >= 17)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                else if (deficit >= 13)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : resistsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemResist = val3;
+                                }
+                            }
+
+                            for (auto const [key4, val4]: gemToResistsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostResist(bonus);
+                                }
+                            }
+
+                            gemName = gemPrefix + " " + gemResist;
+                            std::cout << gemName << '\n';
+
+                            totalImbueCost = totalImbueCost + cost;
+
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                                for (auto const [currResist, value] : currentResistsMap)
+                                {
+                                    if (key == currResist)
+                                    {
+                                        currentResistsMap[currResist] = value + bonus;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursionResist(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToResistsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : resistsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemResist = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemResist;
+                                    for (auto const [currResist, value] : currentResistsMap)
+                                    {
+                                        if (key == currResist)
+                                        {
+                                            currentResistsMap[currResist] = value + bonus;
+                                        }
+                                    }
+                                    gems.push_back(gemName);
+                                    for (auto const [currResist, value] : currentResistsMap)
+                                    {
+                                        if (key == currResist)
+                                        {
+                                            currentResistsMap[currResist] = value + bonus;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                if(val == 2)
+                {
+                    for (auto const [key2, val2]: resistsToCurrentDeficitMap)
+                    {
+                        if ((key == key2) && (val2 > 0))
+                        {
+                            std::string gemPrefix { };
+                            std::string gemResist { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            int cost { };
+                            int bonus { };
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 5)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 7)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 9)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 11)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 15)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 17)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
+                                if (deficit >= 17)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                else if (deficit >= 13)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : resistsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemResist = val3;
+                                }
+                            }
+
+                            for (auto const [key4, val4]: gemToResistsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostResist(bonus);
+                                }
+                            }
+
+                            gemName = gemPrefix + " " + gemResist;
+                            for (auto const [currResist, value] : currentResistsMap)
+                            {
+                                if (key == currResist)
+                                {
+                                    currentResistsMap[currResist] = value + bonus;
+                                }
+                            }
+
+                            totalImbueCost = totalImbueCost + cost;
+
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursionResist(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToResistsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : resistsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemResist = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemResist;
+                                    for (auto const [currResist, value] : currentResistsMap)
+                                    {
+                                        if (key == currResist)
+                                        {
+                                            currentResistsMap[currResist] = value + bonus;
+                                        }
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                if(val == 3)
+                {
+                    for (auto const [key2, val2]: resistsToCurrentDeficitMap)
+                    {
+                        if ((key == key2) && (val2 > 0))
+                        {
+                            std::string gemPrefix { };
+                            std::string gemResist { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            int cost { };
+                            int bonus { };
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 5)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 7)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 9)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 11)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 15)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 17)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
+                                if (deficit >= 17)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                else if (deficit >= 13)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : resistsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemResist = val3;
+                                }
+                            }
+
+                            for (auto const [key4, val4]: gemToResistsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostResist(bonus);
+                                }
+                            }
+
+                            gemName = gemPrefix + " " + gemResist;
+                            for (auto const [currResist, value] : currentResistsMap)
+                            {
+                                if (key == currResist)
+                                {
+                                    currentResistsMap[currResist] = value + bonus;
+                                }
+                            }
+
+                            totalImbueCost = totalImbueCost + cost;
+
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursionResist(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToResistsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : resistsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemResist = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemResist;
+                                    for (auto const [currResist, value] : currentResistsMap)
+                                    {
+                                        if (key == currResist)
+                                        {
+                                            currentResistsMap[currResist] = value + bonus;
+                                        }
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                if(val == 4)
+                {
+                    for (auto const [key2, val2]: resistsToCurrentDeficitMap)
+                    {
+                        if ((key == key2) && (val2 > 0))
+                        {
+                            std::string gemPrefix { };
+                            std::string gemResist { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            int cost { };
+                            int bonus { };
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 5)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 7)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 9)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 11)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 15)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 17)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            /*
+                                resistsMap["body"] = "dusty shielding";
+                                resistsMap["cold"] = "icy shielding";
+                                resistsMap["heat"] = "heated shielding";
+                                resistsMap["energy"] = "light shielding";
+                                resistsMap["matter"] = "earthen shielding";
+                                resistsMap["spirit"] = "vapor shielding";
+                                resistsMap["thrust"] = "airy shielding";
+                                resistsMap["crush"] = "fiery shielding";
+                                resistsMap["slash"] = "watery shielding";
+
+                                gemToResistsMap[1] = "raw";
+                                gemToResistsMap[2] = "uncut";
+                                gemToResistsMap[3] = "rough";
+                                gemToResistsMap[5] = "flawed";
+                                gemToResistsMap[7] = "imperfect";
+                                gemToResistsMap[9] = "polished";
+                                gemToResistsMap[11] = "faceted";
+                                gemToResistsMap[13] = "precious";
+                                gemToResistsMap[15] = "flawless";
+                                gemToResistsMap[17] = "perfect";
+                            */
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
+                                if (deficit >= 17)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                else if (deficit >= 13)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : resistsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemResist = val3;
+                                }
+                            }
+
+                            for (auto const [key4, val4]: gemToResistsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostResist(bonus);
+                                }
+                            }
+
+                            gemName = gemPrefix + " " + gemResist;
+                            for (auto const [currResist, value] : currentResistsMap)
+                            {
+                                if (key == currResist)
+                                {
+                                    currentResistsMap[currResist] = value + bonus;
+                                }
+                            }
+
+                            totalImbueCost = totalImbueCost + cost;
+
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursionResist(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToResistsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : resistsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemResist = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemResist;
+                                    for (auto const [currResist, value] : currentResistsMap)
+                                    {
+                                        if (key == currResist)
+                                        {
+                                            currentResistsMap[currResist] = value + bonus;
+                                        }
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                if(val == 5)
+                {
+                    for (auto const [key2, val2]: resistsToCurrentDeficitMap)
+                    {
+                        if ((key == key2) && (val2 > 0))
+                        {
+                            std::string gemPrefix { };
+                            std::string gemResist { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            int cost { };
+                            int bonus { };
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 5)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 7)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 9)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 11)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 15)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 17)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
+                                if (deficit >= 17)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                else if (deficit >= 13)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : resistsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemResist = val3;
+                                }
+                            }
+
+                            for (auto const [key4, val4]: gemToResistsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostResist(bonus);
+                                }
+                            }
+
+                            gemName = gemPrefix + " " + gemResist;
+                            for (auto const [currResist, value] : currentResistsMap)
+                            {
+                                if (key == currResist)
+                                {
+                                    currentResistsMap[currResist] = value + bonus;
+                                }
+                            }
+
+                            totalImbueCost = totalImbueCost + cost;
+
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursionResist(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToResistsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : resistsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemResist = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemResist;
+                                    for (auto const [currResist, value] : currentResistsMap)
+                                    {
+                                        if (key == currResist)
+                                        {
+                                            currentResistsMap[currResist] = value + bonus;
+                                        }
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                if(val == 6)
+                {
+                    for (auto const [key2, val2]: resistsToCurrentDeficitMap)
+                    {
+                        if ((key == key2) && (val2 > 0))
+                        {
+                            std::string gemPrefix { };
+                            std::string gemResist { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            int cost { };
+                            int bonus { };
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 5)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 7)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 9)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 11)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 15)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 17)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
+                                if (deficit >= 17)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                else if (deficit >= 13)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : resistsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemResist = val3;
+                                }
+                            }
+
+                            for (auto const [key4, val4]: gemToResistsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostResist(bonus);
+                                }
+                            }
+
+                            gemName = gemPrefix + " " + gemResist;
+                            for (auto const [currResist, value] : currentResistsMap)
+                            {
+                                if (key == currResist)
+                                {
+                                    currentResistsMap[currResist] = value + bonus;
+                                }
+                            }
+
+                            totalImbueCost = totalImbueCost + cost;
+
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursionResist(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToResistsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : resistsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemResist = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemResist;
+                                    for (auto const [currResist, value] : currentResistsMap)
+                                    {
+                                        if (key == currResist)
+                                        {
+                                            currentResistsMap[currResist] = value + bonus;
+                                        }
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                if(val == 7)
+                {
+                    for (auto const [key2, val2]: resistsToCurrentDeficitMap)
+                    {
+                        if ((key == key2) && (val2 > 0))
+                        {
+                            std::string gemPrefix { };
+                            std::string gemResist { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            int cost { };
+                            int bonus { };
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 5)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 7)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 9)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 11)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 15)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 17)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
+                                if (deficit >= 17)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                else if (deficit >= 13)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : resistsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemResist = val3;
+                                }
+                            }
+
+                            for (auto const [key4, val4]: gemToResistsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostResist(bonus);
+                                }
+                            }
+
+                            gemName = gemPrefix + " " + gemResist;
+                            for (auto const [currResist, value] : currentResistsMap)
+                            {
+                                if (key == currResist)
+                                {
+                                    currentResistsMap[currResist] = value + bonus;
+                                }
+                            }
+
+                            totalImbueCost = totalImbueCost + cost;
+
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursionResist(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToResistsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : resistsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemResist = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemResist;
+                                    for (auto const [currResist, value] : currentResistsMap)
+                                    {
+                                        if (key == currResist)
+                                        {
+                                            currentResistsMap[currResist] = value + bonus;
+                                        }
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                if(val == 8)
+                {
+                    for (auto const [key2, val2]: resistsToCurrentDeficitMap)
+                    {
+                        if ((key == key2) && (val2 > 0))
+                        {
+                            std::string gemPrefix { };
+                            std::string gemResist { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            int cost { };
+                            int bonus { };
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 5)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 7)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 9)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 11)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 15)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 17)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
+                                if (deficit >= 17)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                else if (deficit >= 13)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : resistsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemResist = val3;
+                                }
+                            }
+
+                            for (auto const [key4, val4]: gemToResistsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostResist(bonus);
+                                }
+                            }
+
+                            gemName = gemPrefix + " " + gemResist;
+                            for (auto const [currResist, value] : currentResistsMap)
+                            {
+                                if (key == currResist)
+                                {
+                                    currentResistsMap[currResist] = value + bonus;
+                                }
+                            }
+
+                            totalImbueCost = totalImbueCost + cost;
+
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursionResist(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToResistsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : resistsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemResist = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemResist;
+                                    for (auto const [currResist, value] : currentResistsMap)
+                                    {
+                                        if (key == currResist)
+                                        {
+                                            currentResistsMap[currResist] = value + bonus;
+                                        }
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                if(val == 9)
+                {
+                    for (auto const [key2, val2]: resistsToCurrentDeficitMap)
+                    {
+                        if ((key == key2) && (val2 > 0))
+                        {
+                            std::string gemPrefix { };
+                            std::string gemResist { };
+                            std::string gemName { };
+                            int bonusValue { };
+                            int deficit = val2;
+                            int cost { };
+                            int bonus { };
+                            // If cap can be reached for any stats with exact values starting at 10, consume a gem
+                            if (deficit == 5)
+                            {
+                                gemPrefix = "flawed";
+                            }
+                            if (deficit == 7)
+                            {
+                                gemPrefix = "imperfect";
+                            }
+                            if (deficit == 9)
+                            {
+                                gemPrefix = "polished";
+                            }
+                            if (deficit == 11)
+                            {
+                                gemPrefix = "faceted";
+                            }
+                            if (deficit == 13)
+                            {
+                                gemPrefix = "precious";
+                            }
+                            if (deficit == 15)
+                            {
+                                gemPrefix = "flawless";
+                            }
+                            if (deficit == 17)
+                            {
+                                gemPrefix = "perfect";
+                            }
+                            else 
+                            {
+                                // If the deficit is large, pump stats in while imbue points are available, otherwise, increment downward
+                                if (deficit >= 17)
+                                {
+                                    gemPrefix = "precious";
+                                }
+                                else if (deficit >= 13)
+                                {
+                                    gemPrefix = "polished";
+                                }
+                                else
+                                {
+                                    gemPrefix = "flawed";
+                                }
+                            }
+                            for (auto const [key3, val3] : resistsMap)
+                            {
+                                if (key == key3)
+                                {
+                                    gemResist = val3;
+                                }
+                            }
+
+                            for (auto const [key4, val4]: gemToResistsMap)
+                            {
+                                if (gemPrefix == val4)
+                                {
+                                    bonus = key4;
+                                    cost = calcImbueCostResist(bonus);
+                                }
+                            }
+
+                            gemName = gemPrefix + " " + gemResist;
+                            for (auto const [currResist, value] : currentResistsMap)
+                            {
+                                if (key == currResist)
+                                {
+                                    currentResistsMap[currResist] = value + bonus;
+                                }
+                            }
+
+                            totalImbueCost = totalImbueCost + cost;
+
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursionResist(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToResistsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : resistsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemResist = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemResist;
+                                    for (auto const [currResist, value] : currentResistsMap)
+                                    {
+                                        if (key == currResist)
+                                        {
+                                            currentResistsMap[currResist] = value + bonus;
+                                        }
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }    
+        }
+        
         createTemplateTable();
         std::cout << "SC Piece #" << i + 1 << '\n';
         for(auto const entry : gems)
@@ -1292,153 +2568,9 @@ int main()
     getCurrentStats();
     getCurrentResists();
     prioritizeStats();
+    prioritizeResists();
     createTemplateTable();
     scCalculator();
 
     return 0;
 }
-
-
-/* old SC calc
-if (neededStats[n] == "Strength")
-{
-    std::cout << "Need " << bonusCap - currentStr << " strength from " << SCPieces << " sc pieces" << '\n';
-    for (auto const [key, val] : gemToStatsMap)
-    {
-        double gemCost = calcImbueCostStat(key);
-        if (((bonusCap - (currentStr + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
-        {
-            gems.push_back(val + " fiery essence");
-            currentStr = currentStr + key;
-            totalImbueCost = totalImbueCost + gemCost;
-            if ((imbueCap - (totalImbueCost)) < 3)
-            {
-                break;
-            }
-        }
-        if (((bonusCap - (currentStr + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
-        {
-            gems.push_back(val + " fiery essence");
-            currentStr = currentStr + key;
-            totalImbueCost = totalImbueCost + gemCost;
-            if ((imbueCap - (totalImbueCost)) < 3)
-            {
-                break;
-            }
-        }
-    }
-}
-if (neededStats[n] == "Dexterity")
-{
-    std::cout << "Need " << bonusCap - currentDex << " dexterity from " << SCPieces << " sc pieces" << '\n';
-    for (auto const [key, val] : gemToStatsMap)
-    {
-        double gemCost = calcImbueCostStat(key);
-        if (((bonusCap - (currentDex + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
-        {
-            gems.push_back(val + " vapor essence");
-            currentDex = currentDex + key;
-            totalImbueCost = totalImbueCost + gemCost;
-            if ((imbueCap - (totalImbueCost)) < 3)
-            {
-                break;
-            }
-        }
-        if (((bonusCap - (currentDex + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
-        {
-            gems.push_back(val + " vapor essence");
-            currentDex = currentDex + key;
-            totalImbueCost = totalImbueCost + gemCost;
-            if ((imbueCap - (totalImbueCost)) < 3)
-            {
-                break;
-            }
-        }
-    }
-}
-if (neededStats[n] == "Quickness")
-{
-    std::cout << "Need " << bonusCap - currentQui << " quickness from " << SCPieces << " sc pieces" << '\n';
-    for (auto const [key, val] : gemToStatsMap)
-    {
-        double gemCost = calcImbueCostStat(key);
-        if (((bonusCap - (currentQui + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
-        {
-            gems.push_back(val + " airy essence");
-            currentQui = currentQui + key;
-            totalImbueCost = totalImbueCost + gemCost;
-            if ((imbueCap - (totalImbueCost)) < 3)
-            {
-                break;
-            }
-        }
-        if (((bonusCap - (currentQui + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
-        {
-            gems.push_back(val + " airy essence");
-            currentQui = currentQui + key;
-            totalImbueCost = totalImbueCost + gemCost;
-            if ((imbueCap - (totalImbueCost)) < 3)
-            {
-                break;
-            }
-        }
-    }
-}
-if (neededStats[n] == "Constitution")
-{
-    std::cout << "Need " << bonusCap - currentCon << " constitution from " << SCPieces << " sc pieces" << '\n';
-    for (auto const [key, val] : gemToStatsMap)
-    {
-        double gemCost = calcImbueCostStat(key);
-        if (((bonusCap - (currentCon + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
-        {
-            gems.push_back(val + " earthen essence");
-            currentCon = currentCon + key;
-            totalImbueCost = totalImbueCost + gemCost;
-            if ((imbueCap - (totalImbueCost)) < 3)
-            {
-                break;
-            }
-        }
-        if (((bonusCap - (currentCon + key)) > 9) && (key >= 16))
-        {
-            gems.push_back(val + " earthen essence");
-            currentCon = currentCon + key;
-            totalImbueCost = totalImbueCost + gemCost;
-            if ((imbueCap - (totalImbueCost)) < 3)
-            {
-                break;
-            }
-        }
-    }
-}
-if (neededStats[n] == "Acuity")
-{
-    std::cout << "Need " << bonusCap - currentAcu << " acuity from " << SCPieces << " sc pieces" << '\n';
-    for (auto const [key, val] : gemToStatsMap)
-    {
-        double gemCost = calcImbueCostStat(key);
-        if (((bonusCap - (currentAcu + key)) == 0) && (imbueCap >= (totalImbueCost + gemCost)))
-        {
-            gems.push_back(val + " dusty essence");
-            currentAcu = currentAcu + key;
-            totalImbueCost = totalImbueCost + gemCost;
-            //
-            if ((imbueCap - (totalImbueCost)) < 3)
-            {
-                break;
-            }
-        }
-        if (((bonusCap - (currentAcu + key)) > 9) && (key >= 16) && (imbueCap >= (totalImbueCost + gemCost)))
-        {
-            gems.push_back(val + " dusty essence");
-            currentAcu = currentAcu + key;
-            totalImbueCost = totalImbueCost + gemCost;
-            if ((imbueCap - (totalImbueCost)) < 3)
-            {
-                break;
-            }
-        }
-    }
-}
-*/
