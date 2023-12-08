@@ -20,7 +20,6 @@ std::map<std::string, std::string> bonusMap { };
 std::map<std::string, std::vector<std::string>> scPiecesGems { };
 
 int bonusCap = 104;
-// This isn't the true imbue cap but for calculations it keeps it below the actual cap
 double imbueCap = 37.5;
 int resistCap = 26;
 int SCPieces{ };
@@ -749,6 +748,10 @@ int scCalculator()
                                     }
                                     gems.push_back(gemName);
                                 }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
+                                }
                             }
                             
                         }
@@ -904,6 +907,10 @@ int scCalculator()
                                     }
                                     gems.push_back(gemName);
                                 }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
+                                }
                             }
                         }
                     }
@@ -1057,6 +1064,10 @@ int scCalculator()
                                         currentAcu = currentAcu + bonus;
                                     }
                                     gems.push_back(gemName);
+                                }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
                                 }
                             }
                         }
@@ -1212,6 +1223,10 @@ int scCalculator()
                                     }
                                     gems.push_back(gemName);
                                 }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
+                                }
                             }
                         }
                     }
@@ -1366,6 +1381,10 @@ int scCalculator()
                                     }
                                     gems.push_back(gemName);
                                 }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
+                                }
                             }
                         }
                     }
@@ -1502,6 +1521,10 @@ int scCalculator()
                                         }
                                     }
                                 }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
+                                }
                             }
                             
                         }
@@ -1623,6 +1646,10 @@ int scCalculator()
                                         }
                                     }
                                     gems.push_back(gemName);
+                                }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
                                 }
                             }
                             
@@ -1746,6 +1773,10 @@ int scCalculator()
                                     }
                                     gems.push_back(gemName);
                                 }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
+                                }
                             }
                             
                         }
@@ -1867,6 +1898,10 @@ int scCalculator()
                                         }
                                     }
                                     gems.push_back(gemName);
+                                }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
                                 }
                             }
                             
@@ -1990,6 +2025,10 @@ int scCalculator()
                                     }
                                     gems.push_back(gemName);
                                 }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
+                                }
                             }
                             
                         }
@@ -2111,6 +2150,10 @@ int scCalculator()
                                         }
                                     }
                                     gems.push_back(gemName);
+                                }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
                                 }
                             }
                             
@@ -2234,6 +2277,10 @@ int scCalculator()
                                     }
                                     gems.push_back(gemName);
                                 }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
+                                }
                             }
                             
                         }
@@ -2356,6 +2403,10 @@ int scCalculator()
                                     }
                                     gems.push_back(gemName);
                                 }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
+                                }
                             }
                             
                         }
@@ -2477,6 +2528,10 @@ int scCalculator()
                                         }
                                     }
                                     gems.push_back(gemName);
+                                }
+                                else
+                                {
+                                    totalImbueCost = totalImbueCost - bonus;
                                 }
                             }
                             
