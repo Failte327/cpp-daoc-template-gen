@@ -753,7 +753,55 @@ int scCalculator()
                             }
                             totalImbueCost = totalImbueCost + cost;
                             
-                            gems.push_back(gemName);
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursion(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToStatsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : statsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemStat = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemStat;
+                                    if (key == "Strength")
+                                    {
+                                        currentStr = currentStr + bonus;
+                                    }
+                                    if (key == "Dexterity")
+                                    {
+                                        currentDex = currentDex + bonus;
+                                    }
+                                    if (key == "Constitution")
+                                    {
+                                        currentCon = currentCon + bonus;
+                                    }
+                                    if (key == "Quickness")
+                                    {
+                                        currentQui = currentQui + bonus;
+                                    }
+                                    if (key == "Acuity")
+                                    {
+                                        currentAcu = currentAcu + bonus;
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
                         }
                     }
                 }
@@ -859,7 +907,55 @@ int scCalculator()
                             }
                             totalImbueCost = totalImbueCost + cost;
                             
-                            gems.push_back(gemName);
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursion(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToStatsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : statsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemStat = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemStat;
+                                    if (key == "Strength")
+                                    {
+                                        currentStr = currentStr + bonus;
+                                    }
+                                    if (key == "Dexterity")
+                                    {
+                                        currentDex = currentDex + bonus;
+                                    }
+                                    if (key == "Constitution")
+                                    {
+                                        currentCon = currentCon + bonus;
+                                    }
+                                    if (key == "Quickness")
+                                    {
+                                        currentQui = currentQui + bonus;
+                                    }
+                                    if (key == "Acuity")
+                                    {
+                                        currentAcu = currentAcu + bonus;
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
                         }
                     }
                 }
@@ -965,7 +1061,55 @@ int scCalculator()
                             }
                             totalImbueCost = totalImbueCost + cost;
                             
-                            gems.push_back(gemName);
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursion(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToStatsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : statsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemStat = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemStat;
+                                    if (key == "Strength")
+                                    {
+                                        currentStr = currentStr + bonus;
+                                    }
+                                    if (key == "Dexterity")
+                                    {
+                                        currentDex = currentDex + bonus;
+                                    }
+                                    if (key == "Constitution")
+                                    {
+                                        currentCon = currentCon + bonus;
+                                    }
+                                    if (key == "Quickness")
+                                    {
+                                        currentQui = currentQui + bonus;
+                                    }
+                                    if (key == "Acuity")
+                                    {
+                                        currentAcu = currentAcu + bonus;
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
                         }
                     }
                 }
@@ -1071,7 +1215,55 @@ int scCalculator()
                             }
                             totalImbueCost = totalImbueCost + cost;
                             
-                            gems.push_back(gemName);
+                            if (totalImbueCost <= imbueCap)
+                            {
+                                gems.push_back(gemName);
+                            }
+                            else
+                            {
+                                bonus = bonus - 6;
+                                cost = scCalcRecursion(bonus);
+                                totalImbueCost = totalImbueCost + cost;
+                                if (totalImbueCost <= imbueCap)
+                                {
+                                    for (auto const [key4, val4]: gemToStatsMap)
+                                    {
+                                        if (bonus == key4)
+                                        {
+                                            gemPrefix = val4;
+                                        }
+                                    }
+                                    for (auto const [key3, val3] : statsMap)
+                                    {
+                                        if (key == key3)
+                                        {
+                                            gemStat = val3;
+                                        }
+                                    }
+                                    gemName = gemPrefix + " " + gemStat;
+                                    if (key == "Strength")
+                                    {
+                                        currentStr = currentStr + bonus;
+                                    }
+                                    if (key == "Dexterity")
+                                    {
+                                        currentDex = currentDex + bonus;
+                                    }
+                                    if (key == "Constitution")
+                                    {
+                                        currentCon = currentCon + bonus;
+                                    }
+                                    if (key == "Quickness")
+                                    {
+                                        currentQui = currentQui + bonus;
+                                    }
+                                    if (key == "Acuity")
+                                    {
+                                        currentAcu = currentAcu + bonus;
+                                    }
+                                    gems.push_back(gemName);
+                                }
+                            }
                         }
                     }
                 }
