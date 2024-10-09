@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/tabulate/include/"
+                "${workspaceFolder}/tabulate/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

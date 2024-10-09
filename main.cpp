@@ -1,3 +1,5 @@
+// TO BUILD, RUN: g++ -I tabulate/include/ -o main main.cpp
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -35,11 +37,13 @@ bool needDex { };
 bool needQui { };
 bool needAcu { };
 std::vector<std::string> neededStats{ };
-
 std::string templateName{ };
-std::vector allStats{"str", "con", "dex", "qui", "acu"};
 std::vector resists{"crush", "slash", "thrust", "heat", "cold", "matter", "energy", "body", "spirit"};
-
+std::vector tanks{"warrior", "berserker", "savage", "shadowblade", "blademaster", "hero", "nightshade", "armsman", "infiltrator", "mercenary"};
+std::vector hybrids{"friar", "heretic", "minstrel", "paladin", "reaver", "champion", "warden", "valewalker", "skald", "thane", "valkyrie"};
+std::vector casters{"cabalist", "necromancer", "sorcerer", "theurgist", "wizard", "animist", "bainshee", "eldritch", "enchanter", "mentalist", "bonedancer", "runemaster", "spiritmaster"};
+std::vector supports{"cleric", "healer", "shaman", "bard", "druid"};
+std::vector archers{"hunter", "scout", "ranger"};
 
 struct greater
 {
@@ -47,183 +51,71 @@ struct greater
     bool operator()(T const &a, T const &b) const { return a > b; }
 };
 
-// Rank the stats by how many points they still need (highest being first)
-int prioritizeStats()
+int createTemplateTable()
 {
-    int strengthDeficit {};
-    int constitutionDeficit {};
-    int dexterityDeficit {};
-    int quicknessDeficit {};
-    int acuityDeficit {};
-    std::vector<std::string> statScores {};
-    for(auto const stat: neededStats)
-    {
-        if (stat == "Strength")
-        {
-            strengthDeficit = bonusCap - currentStr;
-            statsToCurrentDeficitMap[stat] = strengthDeficit;
-        }
-        if (stat == "Dexterity")
-        {
-            dexterityDeficit = bonusCap - currentDex;
-            statsToCurrentDeficitMap[stat] = dexterityDeficit;
-        }
-        if (stat == "Constitution")
-        {
-           constitutionDeficit = bonusCap - currentCon;
-           statsToCurrentDeficitMap[stat] = constitutionDeficit;
-        }
-        if (stat == "Quickness")
-        {
-            quicknessDeficit = bonusCap - currentQui;
-            statsToCurrentDeficitMap[stat] = quicknessDeficit;
-        }
-        if (stat == "Acuity")
-        {
-            acuityDeficit = bonusCap - currentAcu;
-            statsToCurrentDeficitMap[stat] = acuityDeficit;
-        }
-    }
 
-    for (auto const [key, val] : statsToCurrentDeficitMap)
-    {
-        statScores.push_back(std::to_string(val));
-    }
-
-    std::sort(statScores.begin(), statScores.end(), greater());
-
-    for(int i = 0; i < statScores.size(); i++)
-    {
-        for(auto const [key, val]: statsToCurrentDeficitMap)
-        {
-            if (statScores[i] == std::to_string(val))
-            {
-                int rank = i + 1;
-                statRankingsMap[key] = rank;
-            }
-        }
-    }
-
-    return 0;
-}
-
-int getCurrentResists()
-{
-    for (auto const entry : resists)
-    {
-        int resist {};
-        std::cout << "Enter current " << entry << " resist: ";
-        std::cin >> resist;
-        currentResistsMap[entry] = resist;
-    }
-
+    tabulate::Table statsTable{ };
     tabulate::Table resistsTable{ };
+
     int tableRows = 1;
 
+    statsTable.add_row({"Stat", "Value"});
+    statsTable.row(0).format()
+      .font_color(tabulate::Color::white)
+      .font_align(tabulate::FontAlign::center)
+      .font_style({tabulate::FontStyle::bold});
     resistsTable.add_row({"Resist", "Value"});
     resistsTable.row(0).format()
       .font_color(tabulate::Color::white)
       .font_align(tabulate::FontAlign::center)
       .font_style({tabulate::FontStyle::bold});
 
-    for(auto const [key, val] : currentResistsMap)
+    if (needStr)
     {
-        resistsTable.add_row({key, std::to_string(val)});
         tableRows++;
+        statsTable.add_row({"Strength", std::to_string(currentStr)});
+    }
+        
+    if (needCon)
+    {
+        tableRows++;
+        statsTable.add_row({"Constitution", std::to_string(currentCon)});
+    }
+        
+    if (needDex)
+    {
+        tableRows++;
+        statsTable.add_row({"Dexterity", std::to_string(currentDex)});
     }
 
+    if (needQui)
+    {
+        tableRows++;
+        statsTable.add_row({"Quickness", std::to_string(currentQui)});
+    }
+        
+    if (needAcu)
+    {
+        tableRows++;
+        statsTable.add_row({"Acuity", std::to_string(currentAcu)});
+    }
+        
     for(int i = 1; i < tableRows; i++)
     {
-        resistsTable.row(i).format()
-            .font_color(tabulate::Color::green)
-            .font_align(tabulate::FontAlign::center)
-            .font_style({tabulate::FontStyle::bold});
+        statsTable.row(i).format()
+        .font_color(tabulate::Color::green)
+        .font_align(tabulate::FontAlign::center)
+        .font_style({tabulate::FontStyle::bold});
     }
 
-    std::cout << resistsTable;
-
-    return 0;
-}
-
-int prioritizeResists()
-{
-    int crushDeficit {};
-    int slashDeficit {};
-    int thrustDeficit {};
-    int heatDeficit {};
-    int coldDeficit {};
-    int matterDeficit {};
-    int spiritDeficit {};
-    int bodyDeficit {};
-    int energyDeficit {};
-    std::vector<std::string> resistScores {};
-    for(auto const [key, val] : currentResistsMap)
+    for(auto const [resist, value] : currentResistsMap)
     {
-        if (key == "crush")
-        {
-            crushDeficit = resistCap - val;
-            resistsToCurrentDeficitMap[key] = crushDeficit;
-        }
-        if (key == "slash")
-        {
-            slashDeficit = resistCap - val;
-            resistsToCurrentDeficitMap[key] = slashDeficit;
-        }
-        if (key == "thrust")
-        {
-           thrustDeficit = resistCap - val;
-           resistsToCurrentDeficitMap[key] = thrustDeficit;
-        }
-        if (key == "heat")
-        {
-            heatDeficit = resistCap - val;
-            resistsToCurrentDeficitMap[key] = heatDeficit;
-        }
-        if (key == "cold")
-        {
-            coldDeficit = resistCap - val;
-            resistsToCurrentDeficitMap[key] = coldDeficit;
-        }
-        if (key == "matter")
-        {
-            matterDeficit = resistCap - val;
-            resistsToCurrentDeficitMap[key] = matterDeficit;
-        }
-        if (key == "spirit")
-        {
-            spiritDeficit = resistCap - val;
-            resistsToCurrentDeficitMap[key] = spiritDeficit;
-        }
-        if (key == "energy")
-        {
-            energyDeficit = resistCap - val;
-            resistsToCurrentDeficitMap[key] = energyDeficit;
-        }
-        if (key == "body")
-        {
-            bodyDeficit = resistCap - val;
-            resistsToCurrentDeficitMap[key] = bodyDeficit;
-        }
+        int row = 1;
+        resistsTable.add_row({resist, std::to_string(value)});
     }
 
-    for (auto const [key, val] : resistsToCurrentDeficitMap)
-    {
-        resistScores.push_back(std::to_string(val));
-    }
-
-    std::sort(resistScores.begin(), resistScores.end(), greater());
-
-    for(int i = 0; i < resistScores.size(); i++)
-    {
-        for(auto const [key, val]: resistsToCurrentDeficitMap)
-        {
-            if (resistScores[i] == std::to_string(val))
-            {
-                int rank = i + 1;
-                resistRankingsMap[key] = rank;
-            }
-        }
-    }
+    std::cout << statsTable << '\n';
+    std::cout << resistsTable << '\n';
 
     return 0;
 }
@@ -312,149 +204,13 @@ int createSCMaps()
 int displayIntroText()
 {
 
-    std::cout << "WELCOME TO INTERSTELLAR'S SPELLCRAFT CALCULATOR!" << '\n';
-    std::cout << "Inspired by Loki, this simple program will calculate optimal gem combinations based on only a few simple inputs from the user. Enjoy!" << '\n';
+    std::cout << "WELCOME TO REKLEWT'S SPELLCRAFT CALCULATOR!" << '\n';
 
     return 0;
 }
 
-int getNumberOfGearPieces()
+int getTemplateTitle() 
 {
-
-    std::cout << "How many gear pieces will be spellcrafted? ";
-    std::cin >> SCPieces;
-    std::cout << "Spellcrafting " << SCPieces << " pieces";
-    std::cout << '\n';
-
-    return 0;
-};
-
-int getNeededStats() 
-{
-
-    std::string strAnswer { };
-    std::string conAnswer { };
-    std::string dexAnswer { };
-    std::string quiAnswer { };
-    std::string acuAnswer { };
-    std::cout << "Would you like to cap Strength? (y/n)";
-    std::cin >> strAnswer;
-
-    if (strAnswer == "y")
-    {
-        neededStats.push_back("Strength");
-        needStr = true;
-    }
-    else
-    {
-        needStr = false;
-    }
-        
-
-    std::cout << '\n';
-    std::cout << "Would you like to cap Constitution? (y/n)";
-    std::cin >> conAnswer;
-
-    if (conAnswer == "y")
-    {
-        neededStats.push_back("Constitution");
-        needCon = true;
-    }
-    else
-    {
-        needCon = false;
-    }
-
-    std::cout << '\n';
-    std::cout << "Would you like to cap Dexterity? (y/n)";
-    std::cin >> dexAnswer;
-
-    if (dexAnswer == "y")
-    {
-        neededStats.push_back("Dexterity");
-        needDex = true;
-    }
-    else
-    {
-        needDex = false;
-    }
-
-    std::cout << '\n';
-    std::cout << "Would you like to cap Quickness? (y/n)";
-    std::cin >> quiAnswer;
-
-    if (quiAnswer == "y")
-    {
-        neededStats.push_back("Quickness");
-        needQui = true;
-    }
-    else
-    {
-        needQui = false;
-    }
-
-    std::cout << '\n';
-    std::cout << "Would you like to cap Acuity? (y/n)";
-    std::cin >> acuAnswer;
-
-    if (acuAnswer == "y")
-    {
-        neededStats.push_back("Acuity");
-        needAcu = true;
-    }
-    else
-    {
-        needAcu = false;
-    }
-
-    std::cout << '\n';
-
-    return 0;
-}
-
-int getCurrentStats() 
-{
-
-    if (needStr)
-    {
-        std::cout << "Enter current Strength bonus: ";
-        std::cin >> currentStr;
-        statsToCurrentMap["Strength"] = currentStr;
-    }
-        
-    if (needCon)
-    {
-        std::cout << "Enter current Constitution bonus: ";
-        std::cin >> currentCon;
-        statsToCurrentMap["Constitution"] = currentCon;
-    }
-
-    if (needDex)
-    {
-        std::cout << "Enter current Dexterity bonus: ";
-        std::cin >> currentDex;
-        statsToCurrentMap["Dexterity"] = currentDex;
-    }
-
-    if (needQui)
-    {
-        std::cout << "Enter current Quickness bonus: ";
-        std::cin >> currentQui;
-        statsToCurrentMap["Quickness"] = currentQui;
-    }
-
-    if (needAcu)
-    {
-        std::cout << "Enter current Acuity bonus: ";
-        std::cin >> currentAcu;
-        statsToCurrentMap["Acuity"] = currentAcu;
-    }
-
-    return 0;
-}
-
-int getTemplateTitle() {
-
     std::cout << "What would you like to name this template? " << '\n';
     std::getline(std::cin, templateName);
     std::cout << "Creating " << templateName << " template" << '\n';
@@ -462,74 +218,93 @@ int getTemplateTitle() {
     return 0;
 };
 
-int createTemplateTable()
+int getClass() 
 {
 
-    tabulate::Table statsTable{ };
-    tabulate::Table resistsTable{ };
+    std::string classAnswer { };
+    std::cout << "What class is this template for?\n";
+    std::cin >> classAnswer;
 
-    int tableRows = 1;
+    for (int i = 0; i < tanks.size(); i++)
+    {
+        if (tanks[i] == classAnswer) 
+        {
+            needStr = true;
+            needQui = true;
+            needCon = true;
+            needDex = true;
+            needAcu = false;
+        };
+    };
+    for (int i = 0; i < supports.size(); i++)
+    {
+        if (supports[i] == classAnswer) 
+        {
+            needCon = true;
+            needDex = true;
+            needAcu = true;
+            needStr = false;
+            needQui = false;
+        };
+    };
+    for (int i = 0; i < casters.size(); i++)
+    {
+        if (casters[i] == classAnswer) 
+        {
+            needCon = true;
+            needDex = true;
+            needAcu = true;
+            needStr = false;
+            needQui = false;
+        }
+    };
+    for (int i = 0; i < hybrids.size(); i++)
+    {
+        if (hybrids[i] == classAnswer)
+        {
+            needStr = true;
+            needQui = true;
+            needCon = true;
+            needDex = true;
+            needAcu = true;
+        };
+    };
+    for (int i = 0; i < archers.size(); i++)
+    {
+        if (archers[i] == classAnswer)
+        {
+            needStr = true;
+            needQui = true;
+            needCon = true;
+            needDex = true;
+            needAcu = false;
+        };
+    };
 
-    statsTable.add_row({"Stat", "Value"});
-    statsTable.row(0).format()
-      .font_color(tabulate::Color::white)
-      .font_align(tabulate::FontAlign::center)
-      .font_style({tabulate::FontStyle::bold});
-    resistsTable.add_row({"Resist", "Value"});
-    resistsTable.row(0).format()
-      .font_color(tabulate::Color::white)
-      .font_align(tabulate::FontAlign::center)
-      .font_style({tabulate::FontStyle::bold});
-
+    std::cout << "Needed Stats:\n";
     if (needStr)
     {
-        tableRows++;
-        statsTable.add_row({"Strength", std::to_string(currentStr)});
-    }
-        
-    if (needCon)
-    {
-        tableRows++;
-        statsTable.add_row({"Constitution", std::to_string(currentCon)});
-    }
-        
-    if (needDex)
-    {
-        tableRows++;
-        statsTable.add_row({"Dexterity", std::to_string(currentDex)});
-    }
-
-    if (needQui)
-    {
-        tableRows++;
-        statsTable.add_row({"Quickness", std::to_string(currentQui)});
-    }
-        
+        std::cout << "Strength\n";
+    };
     if (needAcu)
     {
-        tableRows++;
-        statsTable.add_row({"Acuity", std::to_string(currentAcu)});
-    }
-        
-    for(int i = 1; i < tableRows; i++)
+        std::cout << "Acuity\n";
+    };
+    if (needDex)
     {
-        statsTable.row(i).format()
-        .font_color(tabulate::Color::green)
-        .font_align(tabulate::FontAlign::center)
-        .font_style({tabulate::FontStyle::bold});
-    }
-
-    for(auto const [resist, value] : currentResistsMap)
+        std::cout << "Dexterity\n";
+    };
+    if (needQui)
     {
-        int row = 1;
-        resistsTable.add_row({resist, std::to_string(value)});
-    }
-
-    std::cout << statsTable << '\n';
-    std::cout << resistsTable << '\n';
+        std::cout << "Quickness\n";
+    };
+    if (needCon)
+    {
+        std::cout << "Constitution\n";
+    };
 
     return 0;
-}
+};
 
 double calcImbueCostStat(int bonusValue)
 {
@@ -2555,18 +2330,12 @@ int scCalculator()
 
 int main()
 {
-    // Template building program that uses your current stats + your number of gear pieces to calculate what gems you need
     createSCMaps();
     displayIntroText();
     getTemplateTitle();
-    getNumberOfGearPieces();
-    getNeededStats();
-    getCurrentStats();
-    getCurrentResists();
-    prioritizeStats();
-    prioritizeResists();
-    createTemplateTable();
-    scCalculator();
+    getClass();
+    // createTemplateTable();
+    // scCalculator();
 
     return 0;
 }
