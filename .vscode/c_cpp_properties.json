@@ -4,7 +4,10 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/tabulate/"
+                "${workspaceFolder}/tabulate/",
+                "${workspaceFolder}/wxWidgets/",
+                "${workspaceFolder}/wxWidgets/include",
+                "${workspaceFolder}/wxWidgets/include/msvc"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

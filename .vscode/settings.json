@@ -69,5 +69,6 @@
         "hash_set": "cpp",
         "bitset": "cpp",
         "regex": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
