@@ -68,7 +68,10 @@
         "hash_map": "cpp",
         "hash_set": "cpp",
         "bitset": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "charconv": "cpp",
+        "forward_list": "cpp",
+        "cfenv": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

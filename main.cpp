@@ -1,9 +1,10 @@
 // TO BUILD, RUN: g++ -I tabulate/include/ -o main main.cpp
-
+#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <iostream>
 #include <vector>
 #include <map>
 #include <tabulate/table.hpp>
+#include "cpp-httplib/httplib.h"
 
 std::map<int, std::string> gemToStatsMap { };
 std::map<int, std::string> gemToResistsMap { };
@@ -36,7 +37,25 @@ bool needCon { };
 bool needDex { };
 bool needQui { };
 bool needAcu { };
+bool needBonusResistPierce { };
+bool needBonusSpellRange { };
+bool needBonusSpellDamage { };
+bool needBonusCastingSpeed { };
+bool needBonusSpellDuration { };
+bool needBonusPowerPool { };
+bool needBonusArcaneSiphon { };
+bool needBonusBuffEffectiveness { };
+bool needBonusDebuff { };
+bool needBonusArmorFactor { };
+bool needBonusMeleeSpeed { };
+bool needBonusMeleeDmg { };
+bool needBonusStyleDmg { };
+bool needBonusHealingEffectiveness { };
+bool needBonusArcheryDmg { };
+bool needBonusArcherySpeed { };
+
 std::vector<std::string> neededStats{ };
+std::vector<std::string> neededBonuses{ };
 std::string templateName{ };
 std::vector resists{"crush", "slash", "thrust", "heat", "cold", "matter", "energy", "body", "spirit"};
 std::vector tanks{"warrior", "berserker", "savage", "shadowblade", "blademaster", "hero", "nightshade", "armsman", "infiltrator", "mercenary"};
@@ -220,7 +239,6 @@ int getTemplateTitle()
 
 int getClass() 
 {
-
     std::string classAnswer { };
     std::cout << "What class is this template for?\n";
     std::cin >> classAnswer;
@@ -234,6 +252,23 @@ int getClass()
             needCon = true;
             needDex = true;
             needAcu = false;
+
+            needBonusArcaneSiphon = false;
+            needBonusArmorFactor = true;
+            needBonusCastingSpeed = false;
+            needBonusDebuff = false;
+            needBonusPowerPool = false;
+            needBonusResistPierce = false;
+            needBonusSpellDamage = false;
+            needBonusSpellDuration = false;
+            needBonusSpellRange = false;
+            needBonusHealingEffectiveness = false;
+            needBonusMeleeDmg = true;
+            needBonusMeleeSpeed = true;
+            needBonusStyleDmg = true;
+            needBonusBuffEffectiveness = false;
+            needBonusArcherySpeed = false;
+            needBonusArcheryDmg = false;
         };
     };
     for (int i = 0; i < supports.size(); i++)
@@ -245,6 +280,23 @@ int getClass()
             needAcu = true;
             needStr = false;
             needQui = false;
+
+            needBonusArcaneSiphon = true;
+            needBonusArmorFactor = true;
+            needBonusCastingSpeed = true;
+            needBonusDebuff = false;
+            needBonusPowerPool = true;
+            needBonusResistPierce = false;
+            needBonusSpellDamage = false;
+            needBonusSpellDuration = true;
+            needBonusSpellRange = true;
+            needBonusHealingEffectiveness = true;
+            needBonusMeleeDmg = false;
+            needBonusMeleeSpeed = false;
+            needBonusStyleDmg = false;
+            needBonusBuffEffectiveness = true;
+            needBonusArcherySpeed = false;
+            needBonusArcheryDmg = false;
         };
     };
     for (int i = 0; i < casters.size(); i++)
@@ -256,6 +308,23 @@ int getClass()
             needAcu = true;
             needStr = false;
             needQui = false;
+
+            needBonusArcaneSiphon = true;
+            needBonusArmorFactor = true;
+            needBonusCastingSpeed = true;
+            needBonusDebuff = true;
+            needBonusPowerPool = true;
+            needBonusResistPierce = true;
+            needBonusSpellDamage = true;
+            needBonusSpellDuration = false;
+            needBonusSpellRange = true;
+            needBonusHealingEffectiveness = false;
+            needBonusMeleeDmg = false;
+            needBonusMeleeSpeed = false;
+            needBonusStyleDmg = false;
+            needBonusBuffEffectiveness = false;
+            needBonusArcherySpeed = false;
+            needBonusArcheryDmg = false;
         }
     };
     for (int i = 0; i < hybrids.size(); i++)
@@ -267,6 +336,23 @@ int getClass()
             needCon = true;
             needDex = true;
             needAcu = true;
+
+            needBonusArcaneSiphon = false;
+            needBonusArmorFactor = true;
+            needBonusCastingSpeed = true;
+            needBonusDebuff = false;
+            needBonusPowerPool = false;
+            needBonusResistPierce = false;
+            needBonusSpellDamage = true;
+            needBonusSpellDuration = false;
+            needBonusSpellRange = true;
+            needBonusHealingEffectiveness = false;
+            needBonusMeleeDmg = true;
+            needBonusMeleeSpeed = true;
+            needBonusStyleDmg = true;
+            needBonusBuffEffectiveness = false;
+            needBonusArcherySpeed = false;
+            needBonusArcheryDmg = false;
         };
     };
     for (int i = 0; i < archers.size(); i++)
@@ -278,33 +364,160 @@ int getClass()
             needCon = true;
             needDex = true;
             needAcu = false;
+
+            needBonusArcaneSiphon = false;
+            needBonusArmorFactor = true;
+            needBonusCastingSpeed = false;
+            needBonusDebuff = false;
+            needBonusPowerPool = false;
+            needBonusResistPierce = true;
+            needBonusSpellDamage = false;
+            needBonusSpellDuration = false;
+            needBonusSpellRange = false;
+            needBonusHealingEffectiveness = false;
+            needBonusMeleeDmg = true;
+            needBonusMeleeSpeed = true;
+            needBonusStyleDmg = true;
+            needBonusBuffEffectiveness = false;
+            needBonusArcherySpeed = true;
+            needBonusArcheryDmg = true;
         };
     };
 
-    std::cout << "Needed Stats:\n";
+    std::cout << "Default Stats Targeted for " + classAnswer + ":\n";
     if (needStr)
     {
         std::cout << "Strength\n";
+        neededStats.push_back("Strength");
     };
     if (needAcu)
     {
         std::cout << "Acuity\n";
+        neededStats.push_back("Acuity");
     };
     if (needDex)
     {
         std::cout << "Dexterity\n";
+        neededStats.push_back("Dexterity");
     };
     if (needQui)
     {
         std::cout << "Quickness\n";
+        neededStats.push_back("Quickness");
     };
     if (needCon)
     {
         std::cout << "Constitution\n";
+        neededStats.push_back("Constitution");
+    };
+    std::cout << "Default Bonuses Targeted for " + classAnswer + ":\n";
+    if (needBonusArcaneSiphon)
+    {
+        std::cout << "Arcane Siphon\n";
+        neededBonuses.push_back("Arcane Siphon");
+    };
+    if (needBonusArmorFactor)
+    {
+        std::cout << "Armor Factor\n";
+        neededBonuses.push_back("Armor Factor");
+    };
+    if (needBonusArcheryDmg)
+    {
+        std::cout << "Archery Damage\n";
+        neededBonuses.push_back("Archery Damage");
+    };
+    if (needBonusArcherySpeed)
+    {
+        std::cout << "Archery Speed\n";
+        neededBonuses.push_back("Archery Speed");
+    };
+    if (needBonusBuffEffectiveness)
+    {
+        std::cout << "Buff Effectiveness\n";
+        neededBonuses.push_back("Buff Effectiveness");
+    };
+    if (needBonusCastingSpeed)
+    {
+        std::cout << "Casting Speed\n";
+        neededBonuses.push_back("Casting Speed");
+    };
+    if (needBonusDebuff)
+    {
+        std::cout << "Debuff Effectiveness\n";
+        neededBonuses.push_back("Debuff Effectiveness");
+    };
+    if (needBonusHealingEffectiveness)
+    {
+        std::cout << "Healing Effectiveness\n";
+        neededBonuses.push_back("Healing Effectiveness");
+    };
+    if (needBonusMeleeDmg)
+    {
+        std::cout << "Melee Damage\n";
+        neededBonuses.push_back("Melee Damage");
+    };
+    if (needBonusMeleeSpeed)
+    {
+        std::cout << "Melee Speed\n";
+        neededBonuses.push_back("Melee Speed");
+    };
+    if (needBonusPowerPool)
+    {
+        std::cout << "Power Pool\n";
+        neededBonuses.push_back("Power Pool");
+    };
+    if (needBonusResistPierce)
+    {
+        std::cout << "Resist Pierce\n";
+        neededBonuses.push_back("Resist Pierce");
+    };
+    if (needBonusSpellDamage)
+    {
+        std::cout << "Spell Damage\n";
+        neededBonuses.push_back("Spell Damage");
+    };
+    if (needBonusSpellDuration)
+    {
+        std::cout << "Spell Duration\n";
+        neededBonuses.push_back("Spell Duration");
+    };
+    if (needBonusSpellRange)
+    {
+        std::cout << "Spell Range\n";
+        neededBonuses.push_back("Spell Range");
+    };
+    if (needBonusStyleDmg)
+    {
+        std::cout << "Style Damage\n";
+        neededBonuses.push_back("Style Damage");
     };
 
     return 0;
 };
+
+int getCurrentGear()
+{
+    std::string chestpiece { };
+    std::cout << "Enter the name of your chest piece: \n";
+    std::cin >> chestpiece;
+
+    try
+    {
+        httplib::Client cli{"https://eden-daoc.net"};
+
+        auto res = cli.Get("/itm/search.php?p=0");
+        res->status;
+        res->body;
+        
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
+
+    return 0;
+}
 
 double calcImbueCostStat(int bonusValue)
 {
@@ -2334,6 +2547,7 @@ int main()
     displayIntroText();
     getTemplateTitle();
     getClass();
+    getCurrentGear();
     // createTemplateTable();
     // scCalculator();
 
