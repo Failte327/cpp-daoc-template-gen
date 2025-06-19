@@ -203,21 +203,75 @@ WebApplication::WebApplication(const Wt::WEnvironment& env) : Wt::WApplication(e
         session.setConnection(std::move(sqlite3));
         session.mapClass<Items>("items");
         dbo::Transaction transaction(session);
-        int count = session.query<int>("select count(*) from items");
+        std::vector<dbo::ptr<Items>> resultList;
+        int counter = 0;
         dbo::collection<dbo::ptr<Items>> itemResults = session.find<Items>().where("name LIKE ?").bind(searchText.toUTF8().c_str()).resultList();
-        for (dbo::collection<dbo::ptr<Items>>::iterator i = itemResults.begin(); i != itemResults.end(); ++i)
+        for (dbo::collection<dbo::ptr<Items>>::iterator iter = itemResults.begin(); iter != itemResults.end(); ++iter)
         {
-            dbo::ptr<Items> item = *i;
-            auto result = root()->addNew<Wt::WText>("Item Name: " + item->name + "\nItem Slot: " + item->slot + "\nItem Type: " + item->item_type + "\nRealm: " + item->realm);
-            auto equip = [this, result] 
-            {
-                chestPiece_->setText(result->text());
-            };
-            root()->addNew<Wt::WPushButton>("Equip")->clicked().connect(equip);
+            ++counter;
+            resultList.push_back(*iter);
+        }
+        for (int i = 0; i < resultList.size(); i++)
+        {
+            Wt::WString text = "Item Name: " + resultList[i]->name + "\nItem Type: " + resultList[i]->item_type + "\nItem Slot: " + resultList[i]->slot + "\nRealm: " + resultList[i]->realm + "\nUtility: " + std::to_string(resultList[i]->utility) + "\n";
+            root()->addNew<Wt::WText>(text);
+            root()->addNew<Wt::WPushButton>("Equip");
+            // root()->addNew<Wt::WPushButton>("Equip")->clicked().connect([this, resultList, i, text]
+            // {
+            //     std::string slot_ = resultList[i]->slot;
+            //     if (slot_ == "Chest")
+            //     {
+            //         chestPiece_->setText(text);
+            //     } else if (slot_ == "Right Hand")
+            //     {
+            //         oneHandWeapon_->setText(text);
+            //     } else if (slot_ == "Cloak")
+            //     {
+            //         cloak_->setText(text);
+            //     } else if (slot_ == "Jewel")
+            //     {
+            //         jewel_->setText(text);
+            //     } else if (slot_ == "Two Handed")
+            //     {
+            //         twoHandWeapon_->setText(text);
+            //     } else if (slot_ == "Legs")
+            //     {
+            //         legs_->setText(text);
+            //     } else if (slot_ == "Left Hand")
+            //     {
+            //         offHandWeapon_->setText(text);
+            //     } else if (slot_ == "Boots")
+            //     {
+            //         boots_->setText(text);
+            //     } else if (slot_ == "Arms")
+            //     {
+            //         arms_->setText(text);
+            //     } else if (slot_ == "Helm")
+            //     {
+            //         helm_->setText(text);
+            //     } else if (slot_ == "Belt")
+            //     {
+            //         belt_->setText(text);
+            //     } else if (slot_ == "Gloves")
+            //     {
+            //         hands_->setText(text);
+            //     } else if (slot_ == "Bracer")
+            //     {
+            //         leftBracer_->setText(text);
+            //     } else if (slot_ == "Ring")
+            //     {
+            //         leftRing_->setText(text);
+            //     } else if (slot_ == "Necklace")
+            //     {
+            //         necklace_->setText(text);
+            //     } else if (slot_ == "Mythirian")
+            //     {
+            //         mythirian_->setText(text);
+            //     };
+            // });
             root()->addNew<Wt::WBreak>();
         }
     };
-
     searchButton_->clicked().connect(search);
 
 };
@@ -229,3 +283,5 @@ int main(int argc, char **argv)
     });
 };
 
+// Build:  g++ -std=c++14 -o web web.cpp -lwthttp -lwt -lwtdbo -lwtdbosqlite3
+// Run: ./web --docroot . --http-address 0.0.0.0 --http-port 3000
